@@ -17,6 +17,16 @@
 
 namespace ArduinoJson {
 
+namespace Internals {
+struct JsonVariantData {
+  // The current type of the variant
+  JsonVariantType type;
+
+  // The various alternatives for the value of the variant.
+  JsonVariantContent content;
+};
+}  // namespace Internals
+
 // Forward declarations.
 class JsonArray;
 class JsonObject;
@@ -31,14 +41,16 @@ class JsonObject;
 class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
  public:
   // Creates an uninitialized JsonVariant
-  JsonVariant() : _type(Internals::JSON_UNDEFINED) {}
+  JsonVariant() {
+    _data.type = Internals::JSON_UNDEFINED;
+  }
 
   // Create a JsonVariant containing a boolean value.
   // It will be serialized as "true" or "false" in JSON.
   JsonVariant(bool value) {
     using namespace Internals;
-    _type = JSON_BOOLEAN;
-    _content.asInteger = static_cast<JsonUInt>(value);
+    _data.type = JSON_BOOLEAN;
+    _data.content.asInteger = static_cast<JsonUInt>(value);
   }
 
   // Create a JsonVariant containing a floating point value.
@@ -49,8 +61,8 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
               typename Internals::enable_if<
                   Internals::is_floating_point<T>::value>::type * = 0) {
     using namespace Internals;
-    _type = JSON_FLOAT;
-    _content.asFloat = static_cast<JsonFloat>(value);
+    _data.type = JSON_FLOAT;
+    _data.content.asFloat = static_cast<JsonFloat>(value);
   }
 
   // Create a JsonVariant containing an integer value.
@@ -67,11 +79,11 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
           0) {
     using namespace Internals;
     if (value >= 0) {
-      _type = JSON_POSITIVE_INTEGER;
-      _content.asInteger = static_cast<JsonUInt>(value);
+      _data.type = JSON_POSITIVE_INTEGER;
+      _data.content.asInteger = static_cast<JsonUInt>(value);
     } else {
-      _type = JSON_NEGATIVE_INTEGER;
-      _content.asInteger = ~static_cast<JsonUInt>(value) + 1;
+      _data.type = JSON_NEGATIVE_INTEGER;
+      _data.content.asInteger = ~static_cast<JsonUInt>(value) + 1;
     }
   }
   // JsonVariant(unsigned short)
@@ -84,8 +96,8 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
                                     Internals::is_unsigned<T>::value>::type * =
           0) {
     using namespace Internals;
-    _type = JSON_POSITIVE_INTEGER;
-    _content.asInteger = static_cast<JsonUInt>(value);
+    _data.type = JSON_POSITIVE_INTEGER;
+    _data.content.asInteger = static_cast<JsonUInt>(value);
   }
 
   // Create a JsonVariant containing a string.
@@ -95,15 +107,15 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   template <typename TChar>
   JsonVariant(const TChar *value,
               typename Internals::enable_if<sizeof(TChar) == 1>::type * = 0) {
-    _type = Internals::JSON_STRING;
-    _content.asString = reinterpret_cast<const char *>(value);
+    _data.type = Internals::JSON_STRING;
+    _data.content.asString = reinterpret_cast<const char *>(value);
   }
 
   // Create a JsonVariant containing an unparsed string
   JsonVariant(Internals::SerializedValue<const char *> value) {
-    _type = Internals::JSON_UNPARSED;
-    _content.asRaw.data = value.data();
-    _content.asRaw.size = value.size();
+    _data.type = Internals::JSON_UNPARSED;
+    _data.content.asRaw.data = value.data();
+    _data.content.asRaw.size = value.size();
   }
 
   JsonVariant(JsonArray array);
@@ -258,36 +270,37 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
 
   // Returns true if the variant has a value
   bool isNull() const {
-    return _type == Internals::JSON_UNDEFINED;
+    return _data.type == Internals::JSON_UNDEFINED;
   }
 
   template <typename Visitor>
   void visit(Visitor &visitor) const {
     using namespace Internals;
-    switch (_type) {
+    switch (_data.type) {
       case JSON_FLOAT:
-        return visitor.acceptFloat(_content.asFloat);
+        return visitor.acceptFloat(_data.content.asFloat);
 
       case JSON_ARRAY:
-        return visitor.acceptArray(_content.asArray);
+        return visitor.acceptArray(_data.content.asArray);
 
       case JSON_OBJECT:
-        return visitor.acceptObject(_content.asObject);
+        return visitor.acceptObject(_data.content.asObject);
 
       case JSON_STRING:
-        return visitor.acceptString(_content.asString);
+        return visitor.acceptString(_data.content.asString);
 
       case JSON_UNPARSED:
-        return visitor.acceptRawJson(_content.asRaw.data, _content.asRaw.size);
+        return visitor.acceptRawJson(_data.content.asRaw.data,
+                                     _data.content.asRaw.size);
 
       case JSON_NEGATIVE_INTEGER:
-        return visitor.acceptNegativeInteger(_content.asInteger);
+        return visitor.acceptNegativeInteger(_data.content.asInteger);
 
       case JSON_POSITIVE_INTEGER:
-        return visitor.acceptPositiveInteger(_content.asInteger);
+        return visitor.acceptPositiveInteger(_data.content.asInteger);
 
       case JSON_BOOLEAN:
-        return visitor.acceptBoolean(_content.asInteger != 0);
+        return visitor.acceptBoolean(_data.content.asInteger != 0);
 
       default:  // JSON_UNDEFINED
         return visitor.acceptNull();
@@ -306,19 +319,15 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   bool variantIsFloat() const;
   bool variantIsInteger() const;
   bool variantIsArray() const {
-    return _type == Internals::JSON_ARRAY;
+    return _data.type == Internals::JSON_ARRAY;
   }
   bool variantIsObject() const {
-    return _type == Internals::JSON_OBJECT;
+    return _data.type == Internals::JSON_OBJECT;
   }
   bool variantIsString() const {
-    return _type == Internals::JSON_STRING;
+    return _data.type == Internals::JSON_STRING;
   }
 
-  // The current type of the variant
-  Internals::JsonVariantType _type;
-
-  // The various alternatives for the value of the variant.
-  Internals::JsonVariantContent _content;
+  Internals::JsonVariantData _data;
 };
 }  // namespace ArduinoJson
