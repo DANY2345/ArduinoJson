@@ -7,25 +7,14 @@
 #include <stddef.h>
 #include <stdint.h>  // for uint8_t
 
-#include "Data/JsonVariantContent.hpp"
 #include "Data/JsonVariantDefault.hpp"
-#include "Data/JsonVariantType.hpp"
 #include "JsonVariantBase.hpp"
+#include "JsonVariantData.hpp"
 #include "Polyfills/type_traits.hpp"
 #include "Serialization/DynamicStringWriter.hpp"
 #include "SerializedValue.hpp"
 
 namespace ArduinoJson {
-
-namespace Internals {
-struct JsonVariantData {
-  // The current type of the variant
-  JsonVariantType type;
-
-  // The various alternatives for the value of the variant.
-  JsonVariantContent content;
-};
-}  // namespace Internals
 
 // Forward declarations.
 class JsonArray;
