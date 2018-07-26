@@ -1,6 +1,22 @@
 ArduinoJson: change log
 =======================
 
+v6.2.3-beta
+-----------
+
+* Fixed exception when using Flash strings as object keys (issue #784)
+
+v6.2.2-beta
+-----------
+
+* Fixed `invalid application of 'sizeof' to incomplete type '__FlashStringHelper'` (issue #783)
+* Fixed `char[]` not duplicated when passed to `JsonVariant::operator[]`
+
+v6.2.1-beta
+-----------
+
+* Fixed `JsonObject` not inserting keys of type `String` (issue #782)
+
 v6.2.0-beta
 -----------
 
