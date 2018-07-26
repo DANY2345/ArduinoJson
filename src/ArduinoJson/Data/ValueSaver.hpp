@@ -5,6 +5,7 @@
 #pragma once
 
 #include "../JsonVariant.hpp"
+#include "../JsonVariantRef.hpp"
 #include "../Memory/JsonBuffer.hpp"
 #include "../Polyfills/type_traits.hpp"
 #include "../Strings/StringTypes.hpp"
@@ -17,6 +18,11 @@ struct ValueSaver {
   template <typename Destination>
   static bool save(JsonBuffer*, Destination& destination, Source source) {
     destination = source;
+    return true;
+  }
+
+  static bool save(JsonBuffer*, JsonVariantRef destination, Source source) {
+    destination.set(source);
     return true;
   }
 };
@@ -33,6 +39,13 @@ struct ValueSaver<
     dest = dup;
     return true;
   }
+
+  static bool save(JsonBuffer* buffer, JsonVariantRef dest, TString source) {
+    const char* dup = makeString(source).save(buffer);
+    if (!dup) return false;
+    dest.set(dup);
+    return true;
+  }
 };
 
 // We duplicate all SerializedValue<T> except SerializedValue<const char*>
@@ -46,6 +59,14 @@ struct ValueSaver<
     const char* dup = makeString(source.data(), source.size()).save(buffer);
     if (!dup) return false;
     dest = SerializedValue<const char*>(dup, source.size());
+    return true;
+  }
+
+  static bool save(JsonBuffer* buffer, JsonVariantRef dest,
+                   const SerializedValue<TString>& source) {
+    const char* dup = makeString(source.data(), source.size()).save(buffer);
+    if (!dup) return false;
+    dest.set(SerializedValue<const char*>(dup, source.size()));
     return true;
   }
 };

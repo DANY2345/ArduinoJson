@@ -10,6 +10,7 @@ namespace ArduinoJson {
 
 class JsonObject {
   friend class JsonVariant;
+  friend class JsonVariantRef;
 
  public:
   typedef Internals::JsonObjectData::iterator iterator;

@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "JsonArrayConstIterator.hpp"
 #include "JsonArrayData.hpp"
 #include "JsonArrayIterator.hpp"
 
@@ -18,10 +17,10 @@ class JsonArraySubscript;
 
 class JsonArray {
   friend class JsonVariant;
+  friend class JsonVariantRef;
 
  public:
   typedef JsonArrayIterator iterator;
-  typedef JsonArrayConstIterator const_iterator;
 
   JsonArray() : _data(0) {}
   JsonArray(Internals::JsonArrayData* arr) : _data(arr) {}
@@ -45,22 +44,13 @@ class JsonArray {
     return add_impl<T*>(value);
   }
 
-  iterator begin() {
+  iterator begin() const {
     if (!_data) return iterator();
     return iterator(_data->begin());
   }
 
-  const_iterator begin() const {
-    if (!_data) return const_iterator();
-    return iterator(_data->begin());
-  }
-
-  iterator end() {
+  iterator end() const {
     return iterator();
-  }
-
-  const_iterator end() const {
-    return const_iterator();
   }
 
   // Imports a 1D array
@@ -102,8 +92,7 @@ class JsonArray {
   template <typename T>
   size_t copyTo(T* array, size_t len) const {
     size_t i = 0;
-    for (const_iterator it = begin(); it != end() && i < len; ++it)
-      array[i++] = *it;
+    for (iterator it = begin(); it != end() && i < len; ++it) array[i++] = *it;
     return i;
   }
 
@@ -112,7 +101,7 @@ class JsonArray {
   void copyTo(T (&array)[N1][N2]) const {
     if (!_data) return;
     size_t i = 0;
-    for (const_iterator it = begin(); it != end() && i < N1; ++it) {
+    for (iterator it = begin(); it != end() && i < N1; ++it) {
       it->as<JsonArray>().copyTo(array[i++]);
     }
   }
@@ -131,14 +120,14 @@ class JsonArray {
   // Gets the value at the specified index.
   template <typename T>
   typename Internals::JsonVariantAs<T>::type get(size_t index) const {
-    const_iterator it = begin() += index;
+    iterator it = begin() += index;
     return it != end() ? it->as<T>() : Internals::JsonVariantDefault<T>::get();
   }
 
   // Check the type of the value at specified index.
   template <typename T>
   bool is(size_t index) const {
-    const_iterator it = begin() += index;
+    iterator it = begin() += index;
     return it != end() ? it->is<T>() : false;
   }
 

@@ -8,6 +8,7 @@
 #include <stdint.h>  // for uint8_t
 
 #include "Data/JsonVariantDefault.hpp"
+#include "JsonVariant.hpp"
 #include "JsonVariantBase.hpp"
 #include "JsonVariantData.hpp"
 #include "Polyfills/type_traits.hpp"
@@ -27,94 +28,97 @@ class JsonObject;
 // - a char, short, int or a long (signed or unsigned)
 // - a string (const char*)
 // - a reference to a JsonArray or JsonObject
-class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
-  friend class JsonVariantRef;
-
+class JsonVariantRef : public Internals::JsonVariantBase<JsonVariantRef> {
  public:
   // Creates an uninitialized JsonVariant
-  JsonVariant(Internals::JsonVariantData data) : _data(data) {}
+  JsonVariantRef(Internals::JsonVariantData *data) : _data(data) {}
 
   // Creates an uninitialized JsonVariant
-  JsonVariant() {
-    _data.type = Internals::JSON_UNDEFINED;
-  }
+  JsonVariantRef() : _data(0) {}
 
   // Create a JsonVariant containing a boolean value.
   // It will be serialized as "true" or "false" in JSON.
-  JsonVariant(bool value) {
+  void set(bool value) {
     using namespace Internals;
-    _data.type = JSON_BOOLEAN;
-    _data.content.asInteger = static_cast<JsonUInt>(value);
+    _data->type = JSON_BOOLEAN;
+    _data->content.asInteger = static_cast<JsonUInt>(value);
   }
 
   // Create a JsonVariant containing a floating point value.
-  // JsonVariant(double value);
-  // JsonVariant(float value);
+  // set(double value);
+  // set(float value);
   template <typename T>
-  JsonVariant(T value,
-              typename Internals::enable_if<
-                  Internals::is_floating_point<T>::value>::type * = 0) {
+  void set(T value, typename Internals::enable_if<
+                        Internals::is_floating_point<T>::value>::type * = 0) {
     using namespace Internals;
-    _data.type = JSON_FLOAT;
-    _data.content.asFloat = static_cast<JsonFloat>(value);
+    _data->type = JSON_FLOAT;
+    _data->content.asFloat = static_cast<JsonFloat>(value);
   }
 
   // Create a JsonVariant containing an integer value.
-  // JsonVariant(char)
-  // JsonVariant(signed short)
-  // JsonVariant(signed int)
-  // JsonVariant(signed long)
-  // JsonVariant(signed char)
+  // set(char)
+  // set(signed short)
+  // set(signed int)
+  // set(signed long)
+  // set(signed char)
   template <typename T>
-  JsonVariant(
-      T value,
-      typename Internals::enable_if<Internals::is_integral<T>::value &&
-                                    Internals::is_signed<T>::value>::type * =
-          0) {
+  void set(T value,
+           typename Internals::enable_if<Internals::is_integral<T>::value &&
+                                         Internals::is_signed<T>::value>::type
+               * = 0) {
     using namespace Internals;
     if (value >= 0) {
-      _data.type = JSON_POSITIVE_INTEGER;
-      _data.content.asInteger = static_cast<JsonUInt>(value);
+      _data->type = JSON_POSITIVE_INTEGER;
+      _data->content.asInteger = static_cast<JsonUInt>(value);
     } else {
-      _data.type = JSON_NEGATIVE_INTEGER;
-      _data.content.asInteger = ~static_cast<JsonUInt>(value) + 1;
+      _data->type = JSON_NEGATIVE_INTEGER;
+      _data->content.asInteger = ~static_cast<JsonUInt>(value) + 1;
     }
   }
-  // JsonVariant(unsigned short)
-  // JsonVariant(unsigned int)
-  // JsonVariant(unsigned long)
+  // set(unsigned short)
+  // set(unsigned int)
+  // set(unsigned long)
   template <typename T>
-  JsonVariant(
-      T value,
-      typename Internals::enable_if<Internals::is_integral<T>::value &&
-                                    Internals::is_unsigned<T>::value>::type * =
-          0) {
+  void set(T value,
+           typename Internals::enable_if<Internals::is_integral<T>::value &&
+                                         Internals::is_unsigned<T>::value>::type
+               * = 0) {
     using namespace Internals;
-    _data.type = JSON_POSITIVE_INTEGER;
-    _data.content.asInteger = static_cast<JsonUInt>(value);
+    _data->type = JSON_POSITIVE_INTEGER;
+    _data->content.asInteger = static_cast<JsonUInt>(value);
   }
 
   // Create a JsonVariant containing a string.
-  // JsonVariant(const char*);
-  // JsonVariant(const signed char*);
-  // JsonVariant(const unsigned char*);
+  // set(const char*);
+  // set(const signed char*);
+  // set(const unsigned char*);
   template <typename TChar>
-  JsonVariant(const TChar *value,
-              typename Internals::enable_if<sizeof(TChar) == 1>::type * = 0) {
-    _data.type = Internals::JSON_STRING;
-    _data.content.asString = reinterpret_cast<const char *>(value);
+  void set(const TChar *value,
+           typename Internals::enable_if<sizeof(TChar) == 1>::type * = 0) {
+    _data->type = Internals::JSON_STRING;
+    _data->content.asString = reinterpret_cast<const char *>(value);
   }
 
   // Create a JsonVariant containing an unparsed string
-  JsonVariant(Internals::SerializedValue<const char *> value) {
-    _data.type = Internals::JSON_UNPARSED;
-    _data.content.asRaw.data = value.data();
-    _data.content.asRaw.size = value.size();
+  void set(Internals::SerializedValue<const char *> value) {
+    _data->type = Internals::JSON_UNPARSED;
+    _data->content.asRaw.data = value.data();
+    _data->content.asRaw.size = value.size();
   }
 
-  JsonVariant(JsonArray array);
-  JsonVariant(JsonObject object);
+  void set(JsonVariant value) {
+    *_data = value._data;
+  }
 
+  void set(JsonVariantRef value) {
+    *_data = *value._data;
+  }
+
+  void set(JsonArray array);
+  void set(const Internals::JsonArraySubscript &);
+  void set(JsonObject object);
+  template <typename TString>
+  void set(const Internals::JsonObjectSubscript<TString> &);
   // Get the variant as the specified type.
   //
   // char as<char>() const;
@@ -190,10 +194,18 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   //
   // JsonVariant as<JsonVariant> const;
   template <typename T>
-  typename Internals::enable_if<Internals::is_same<T, JsonVariant>::value,
+  typename Internals::enable_if<Internals::is_same<T, JsonVariantRef>::value,
                                 T>::type
   as() const {
     return *this;
+  }
+  //
+  // JsonVariant as<JsonVariant> const;
+  template <typename T>
+  typename Internals::enable_if<Internals::is_same<T, JsonVariant>::value,
+                                T>::type
+  as() const {
+    return JsonVariant(*_data);
   }
 
   // Tells weither the variant has the specified type.
@@ -264,37 +276,37 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
 
   // Returns true if the variant has a value
   bool isNull() const {
-    return _data.type == Internals::JSON_UNDEFINED;
+    return _data->type == Internals::JSON_UNDEFINED;
   }
 
   template <typename Visitor>
   void visit(Visitor &visitor) const {
     using namespace Internals;
-    switch (_data.type) {
+    switch (_data->type) {
       case JSON_FLOAT:
-        return visitor.acceptFloat(_data.content.asFloat);
+        return visitor.acceptFloat(_data->content.asFloat);
 
       case JSON_ARRAY:
-        return visitor.acceptArray(_data.content.asArray);
+        return visitor.acceptArray(_data->content.asArray);
 
       case JSON_OBJECT:
-        return visitor.acceptObject(_data.content.asObject);
+        return visitor.acceptObject(_data->content.asObject);
 
       case JSON_STRING:
-        return visitor.acceptString(_data.content.asString);
+        return visitor.acceptString(_data->content.asString);
 
       case JSON_UNPARSED:
-        return visitor.acceptRawJson(_data.content.asRaw.data,
-                                     _data.content.asRaw.size);
+        return visitor.acceptRawJson(_data->content.asRaw.data,
+                                     _data->content.asRaw.size);
 
       case JSON_NEGATIVE_INTEGER:
-        return visitor.acceptNegativeInteger(_data.content.asInteger);
+        return visitor.acceptNegativeInteger(_data->content.asInteger);
 
       case JSON_POSITIVE_INTEGER:
-        return visitor.acceptPositiveInteger(_data.content.asInteger);
+        return visitor.acceptPositiveInteger(_data->content.asInteger);
 
       case JSON_BOOLEAN:
-        return visitor.acceptBoolean(_data.content.asInteger != 0);
+        return visitor.acceptBoolean(_data->content.asInteger != 0);
 
       default:  // JSON_UNDEFINED
         return visitor.acceptNull();
@@ -313,15 +325,15 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   bool variantIsFloat() const;
   bool variantIsInteger() const;
   bool variantIsArray() const {
-    return _data.type == Internals::JSON_ARRAY;
+    return _data->type == Internals::JSON_ARRAY;
   }
   bool variantIsObject() const {
-    return _data.type == Internals::JSON_OBJECT;
+    return _data->type == Internals::JSON_OBJECT;
   }
   bool variantIsString() const {
-    return _data.type == Internals::JSON_STRING;
+    return _data->type == Internals::JSON_STRING;
   }
 
-  Internals::JsonVariantData _data;
+  Internals::JsonVariantData *_data;
 };
 }  // namespace ArduinoJson
