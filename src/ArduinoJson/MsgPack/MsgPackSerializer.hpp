@@ -65,8 +65,8 @@ class MsgPackSerializer {
     }
     for (JsonObject::const_iterator it = object.begin(); it != object.end();
          ++it) {
-      acceptString(it->key);
-      it->value.visit(*this);
+      acceptString(it->key());
+      it->value().visit(*this);
     }
   }
 

@@ -255,7 +255,7 @@ class JsonObject {
   iterator findKey(TStringRef key) {
     iterator it;
     for (it = begin(); it != end(); ++it) {
-      if (Internals::makeString(key).equals(it->key)) break;
+      if (Internals::makeString(key).equals(it->key())) break;
     }
     return it;
   }
@@ -268,14 +268,14 @@ class JsonObject {
   typename Internals::JsonVariantAs<TValue>::type get_impl(
       TStringRef key) const {
     const_iterator it = findKey<TStringRef>(key);
-    return it != end() ? it->value.as<TValue>()
+    return it != end() ? it->value().as<TValue>()
                        : Internals::JsonVariantDefault<TValue>::get();
   }
 
   template <typename TStringRef, typename TValue>
   bool is_impl(TStringRef key) const {
     const_iterator it = findKey<TStringRef>(key);
-    return it != end() ? it->value.is<TValue>() : false;
+    return it != end() ? it->value().is<TValue>() : false;
   }
 
   template <typename TStringRef>
@@ -297,13 +297,13 @@ class JsonObject {
       // add the key
       it = _data->add();
       if (it == end()) return false;
-      bool key_ok =
-          Internals::ValueSaver<TStringRef>::save(_data->_buffer, it->key, key);
+      bool key_ok = Internals::ValueSaver<TStringRef>::save(_data->_buffer,
+                                                            it->key(), key);
       if (!key_ok) return false;
     }
 
     // save the value
-    return Internals::ValueSaver<TValueRef>::save(_data->_buffer, it->value,
+    return Internals::ValueSaver<TValueRef>::save(_data->_buffer, it->value(),
                                                   value);
   }
 

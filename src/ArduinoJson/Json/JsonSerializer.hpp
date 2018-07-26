@@ -41,9 +41,9 @@ class JsonSerializer {
 
     JsonObject::const_iterator it = object.begin();
     while (it != object.end()) {
-      _writer.writeString(it->key);
+      _writer.writeString(it->key());
       _writer.writeColon();
-      it->value.visit(*this);
+      it->value().visit(*this);
 
       ++it;
       if (it == object.end()) break;

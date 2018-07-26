@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "../JsonPair.hpp"
 #include "../JsonVariant.hpp"
 #include "../JsonVariantRef.hpp"
 #include "../Memory/JsonBuffer.hpp"
@@ -22,6 +23,11 @@ struct ValueSaver {
   }
 
   static bool save(JsonBuffer*, JsonVariantRef destination, Source source) {
+    destination.set(source);
+    return true;
+  }
+
+  static bool save(JsonBuffer*, JsonKey destination, Source source) {
     destination.set(source);
     return true;
   }
@@ -46,6 +52,13 @@ struct ValueSaver<
     dest.set(dup);
     return true;
   }
+
+  static bool save(JsonBuffer* buffer, JsonKey dest, TString source) {
+    const char* dup = makeString(source).save(buffer);
+    if (!dup) return false;
+    dest.set(dup);
+    return true;
+  }
 };
 
 // We duplicate all SerializedValue<T> except SerializedValue<const char*>
@@ -63,6 +76,14 @@ struct ValueSaver<
   }
 
   static bool save(JsonBuffer* buffer, JsonVariantRef dest,
+                   const SerializedValue<TString>& source) {
+    const char* dup = makeString(source.data(), source.size()).save(buffer);
+    if (!dup) return false;
+    dest.set(SerializedValue<const char*>(dup, source.size()));
+    return true;
+  }
+
+  static bool save(JsonBuffer* buffer, JsonKey dest,
                    const SerializedValue<TString>& source) {
     const char* dup = makeString(source.data(), source.size()).save(buffer);
     if (!dup) return false;

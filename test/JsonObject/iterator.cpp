@@ -16,16 +16,16 @@ TEST_CASE("JsonObject::begin()/end()") {
   SECTION("NonConstIterator") {
     JsonObject::iterator it = obj.begin();
     REQUIRE(obj.end() != it);
-    REQUIRE_THAT(it->key, Equals("ab"));
-    REQUIRE(12 == it->value);
-    it->key = "a.b";
-    it->value = 1.2;
+    REQUIRE_THAT(static_cast<const char*>(it->key()), Equals("ab"));
+    REQUIRE(12 == it->value());
+    it->key() = "a.b";
+    it->value() = 1.2;
     ++it;
     REQUIRE(obj.end() != it);
-    REQUIRE_THAT(it->key, Equals("cd"));
-    REQUIRE(34 == it->value);
-    it->key = "c.d";
-    it->value = 3.4;
+    REQUIRE_THAT(static_cast<const char*>(it->key()), Equals("cd"));
+    REQUIRE(34 == it->value());
+    it->key() = "c.d";
+    it->value() = 3.4;
     ++it;
     REQUIRE(obj.end() == it);
 
@@ -39,12 +39,12 @@ TEST_CASE("JsonObject::begin()/end()") {
     JsonObject::const_iterator it = const_object.begin();
 
     REQUIRE(const_object.end() != it);
-    REQUIRE_THAT(it->key, Equals("ab"));
-    REQUIRE(12 == it->value);
+    REQUIRE_THAT(it->key(), Equals("ab"));
+    REQUIRE(12 == it->value());
     ++it;
     REQUIRE(const_object.end() != it);
-    REQUIRE_THAT(it->key, Equals("cd"));
-    REQUIRE(34 == it->value);
+    REQUIRE_THAT(it->key(), Equals("cd"));
+    REQUIRE(34 == it->value());
     ++it;
     REQUIRE(const_object.end() == it);
   }

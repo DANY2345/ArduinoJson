@@ -8,9 +8,52 @@
 
 namespace ArduinoJson {
 
-// A key value pair for JsonObjectData.
-struct JsonPair {
+struct JsonPairData {
   const char* key;
   JsonVariant value;
+};
+
+class JsonKey {
+ public:
+  explicit JsonKey(JsonPairData* data) : _data(data) {}
+
+  operator const char*() const {
+    return _data->key;
+  }
+
+  JsonKey& operator=(const char* key) {
+    _data->key = key;
+    return *this;
+  }
+
+  void set(const char* key) {
+    _data->key = key;
+  }
+
+ private:
+  JsonPairData* _data;
+};
+
+// A key value pair for JsonObjectData.
+class JsonPair {
+ public:
+  JsonKey key() {
+    return JsonKey(&_data);
+  }
+
+  const char* key() const {
+    return _data.key;
+  }
+
+  JsonVariant& value() {
+    return _data.value;
+  }
+
+  const JsonVariant& value() const {
+    return _data.value;
+  }
+
+ private:
+  JsonPairData _data;
 };
 }  // namespace ArduinoJson
