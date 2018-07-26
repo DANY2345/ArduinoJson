@@ -121,6 +121,11 @@ inline std::ostream &operator<<(std::ostream &os, const JsonVariant &source) {
   serializeJson(source, os);
   return os;
 }
+inline std::ostream &operator<<(std::ostream &os,
+                                const JsonVariantRef &source) {
+  serializeJson(source, os);
+  return os;
+}
 
 namespace Internals {
 inline std::ostream &operator<<(std::ostream &os,

@@ -48,16 +48,14 @@ struct ValueSaver<
 
   static bool save(JsonBuffer* buffer, JsonVariantRef dest, TString source) {
     const char* dup = makeString(source).save(buffer);
-    if (!dup) return false;
     dest.set(dup);
-    return true;
+    return dup != NULL;
   }
 
   static bool save(JsonBuffer* buffer, JsonKey dest, TString source) {
     const char* dup = makeString(source).save(buffer);
-    if (!dup) return false;
     dest.set(dup);
-    return true;
+    return dup != NULL;
   }
 };
 

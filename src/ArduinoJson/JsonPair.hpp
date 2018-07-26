@@ -5,25 +5,24 @@
 #pragma once
 
 #include "JsonVariant.hpp"
+#include "JsonVariantRef.hpp"
 
 namespace ArduinoJson {
 
+namespace Internals {
+
 struct JsonPairData {
   const char* key;
-  JsonVariant value;
+  JsonVariantData value;
 };
+}  // namespace Internals
 
 class JsonKey {
  public:
-  explicit JsonKey(JsonPairData* data) : _data(data) {}
+  explicit JsonKey(Internals::JsonPairData* data) : _data(data) {}
 
   operator const char*() const {
     return _data->key;
-  }
-
-  JsonKey& operator=(const char* key) {
-    _data->key = key;
-    return *this;
   }
 
   void set(const char* key) {
@@ -31,7 +30,7 @@ class JsonKey {
   }
 
  private:
-  JsonPairData* _data;
+  Internals::JsonPairData* _data;
 };
 
 // A key value pair for JsonObjectData.
@@ -45,15 +44,15 @@ class JsonPair {
     return _data.key;
   }
 
-  JsonVariant& value() {
-    return _data.value;
+  JsonVariantRef value() {
+    return JsonVariantRef(&_data.value);
   }
 
-  const JsonVariant& value() const {
-    return _data.value;
+  JsonVariant value() const {
+    return JsonVariant(_data.value);
   }
 
  private:
-  JsonPairData _data;
+  Internals::JsonPairData _data;
 };
 }  // namespace ArduinoJson

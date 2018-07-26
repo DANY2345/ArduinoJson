@@ -18,14 +18,14 @@ TEST_CASE("JsonObject::begin()/end()") {
     REQUIRE(obj.end() != it);
     REQUIRE_THAT(static_cast<const char*>(it->key()), Equals("ab"));
     REQUIRE(12 == it->value());
-    it->key() = "a.b";
-    it->value() = 1.2;
+    it->key().set("a.b");
+    it->value().set(1.2);
     ++it;
     REQUIRE(obj.end() != it);
     REQUIRE_THAT(static_cast<const char*>(it->key()), Equals("cd"));
     REQUIRE(34 == it->value());
-    it->key() = "c.d";
-    it->value() = 3.4;
+    it->key().set("c.d");
+    it->value().set(3.4);
     ++it;
     REQUIRE(obj.end() == it);
 
