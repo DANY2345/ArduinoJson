@@ -30,6 +30,9 @@ class JsonObject;
 class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
  public:
   // Creates an uninitialized JsonVariant
+  JsonVariant(Internals::JsonVariantData data) : _data(data) {}
+
+  // Creates an uninitialized JsonVariant
   JsonVariant() {
     _data.type = Internals::JSON_UNDEFINED;
   }

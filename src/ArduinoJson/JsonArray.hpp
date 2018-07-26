@@ -4,7 +4,9 @@
 
 #pragma once
 
-#include "./JsonArrayData.hpp"
+#include "JsonArrayConstIterator.hpp"
+#include "JsonArrayData.hpp"
+#include "JsonArrayIterator.hpp"
 
 namespace ArduinoJson {
 
@@ -18,8 +20,8 @@ class JsonArray {
   friend class JsonVariant;
 
  public:
-  typedef Internals::JsonArrayData::iterator iterator;
-  typedef Internals::JsonArrayData::const_iterator const_iterator;
+  typedef JsonArrayIterator iterator;
+  typedef JsonArrayConstIterator const_iterator;
 
   JsonArray() : _data(0) {}
   JsonArray(Internals::JsonArrayData* arr) : _data(arr) {}
@@ -45,12 +47,12 @@ class JsonArray {
 
   iterator begin() {
     if (!_data) return iterator();
-    return _data->begin();
+    return iterator(_data->begin());
   }
 
   const_iterator begin() const {
     if (!_data) return const_iterator();
-    return _data->begin();
+    return iterator(_data->begin());
   }
 
   iterator end() {
@@ -143,7 +145,7 @@ class JsonArray {
   // Removes element at specified position.
   void remove(iterator it) {
     if (!_data) return;
-    _data->remove(it);
+    _data->remove(it.internal());
   }
 
   // Removes element at specified index.
@@ -198,7 +200,7 @@ class JsonArray {
   template <typename TValueRef>
   bool add_impl(TValueRef value) {
     if (!_data) return false;
-    iterator it = _data->add();
+    iterator it = iterator(_data->add());
     if (it == end()) return false;
     return Internals::ValueSaver<TValueRef>::save(_data->_buffer, *it, value);
   }

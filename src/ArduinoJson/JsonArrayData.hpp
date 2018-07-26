@@ -6,7 +6,7 @@
 
 #include "Data/List.hpp"
 #include "Data/ValueSaver.hpp"
-#include "JsonVariant.hpp"
+#include "JsonVariantData.hpp"
 #include "Memory/JsonBufferAllocated.hpp"
 #include "Polyfills/type_traits.hpp"
 
@@ -19,8 +19,9 @@
 
 namespace ArduinoJson {
 namespace Internals {
-struct JsonArrayData : List<JsonVariant>, JsonBufferAllocated {
-  explicit JsonArrayData(JsonBuffer *buf) throw() : List<JsonVariant>(buf) {}
+struct JsonArrayData : List<JsonVariantData>, JsonBufferAllocated {
+  explicit JsonArrayData(JsonBuffer *buf) throw()
+      : List<JsonVariantData>(buf) {}
 };
 }  // namespace Internals
 }  // namespace ArduinoJson
