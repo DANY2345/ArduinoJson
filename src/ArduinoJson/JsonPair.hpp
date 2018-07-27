@@ -34,20 +34,4 @@ class JsonPair {
   const char* _key;
   JsonVariant _value;
 };
-
-class JsonPairPtr {
- public:
-  JsonPairPtr(Internals::JsonPairData* data) : _pair(data) {}
-
-  const JsonPair* operator->() const {
-    return &_pair;
-  }
-
-  const JsonPair& operator*() const {
-    return _pair;
-  }
-
- private:
-  JsonPair _pair;
-};
 }  // namespace ArduinoJson

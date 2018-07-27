@@ -9,7 +9,22 @@
 
 namespace ArduinoJson {
 
-// A read-write forward iterator for JsonArray
+class JsonVariantPtr {
+ public:
+  JsonVariantPtr(Internals::JsonVariantData *data) : _variant(data) {}
+
+  const JsonVariant *operator->() const {
+    return &_variant;
+  }
+
+  const JsonVariant &operator*() const {
+    return _variant;
+  }
+
+ private:
+  JsonVariant _variant;
+};
+
 class JsonArrayIterator {
   typedef Internals::ListIterator<Internals::JsonVariantData> internal_iterator;
 
@@ -18,13 +33,11 @@ class JsonArrayIterator {
   explicit JsonArrayIterator(internal_iterator iterator)
       : _iterator(iterator) {}
 
-  JsonVariant &operator*() const {
-    _variant = JsonVariant(&*_iterator);
-    return _variant;
+  JsonVariant operator*() const {
+    return JsonVariant(&*_iterator);
   }
-  JsonVariant *operator->() {
-    _variant = JsonVariant(&*_iterator);
-    return &_variant;
+  JsonVariantPtr operator->() {
+    return JsonVariantPtr(&*_iterator);
   }
 
   bool operator==(const JsonArrayIterator &other) const {
@@ -51,6 +64,5 @@ class JsonArrayIterator {
 
  private:
   internal_iterator _iterator;
-  mutable JsonVariant _variant;
 };
 }  // namespace ArduinoJson
