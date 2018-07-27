@@ -26,11 +26,6 @@ struct ValueSaver {
     destination.set(source);
     return true;
   }
-
-  static bool save(JsonBuffer*, JsonKey destination, Source source) {
-    destination.set(source);
-    return true;
-  }
 };
 
 // We duplicate all strings except const char*
@@ -47,12 +42,6 @@ struct ValueSaver<
   }
 
   static bool save(JsonBuffer* buffer, JsonVariantRef dest, TString source) {
-    const char* dup = makeString(source).save(buffer);
-    dest.set(dup);
-    return dup != NULL;
-  }
-
-  static bool save(JsonBuffer* buffer, JsonKey dest, TString source) {
     const char* dup = makeString(source).save(buffer);
     dest.set(dup);
     return dup != NULL;
@@ -74,14 +63,6 @@ struct ValueSaver<
   }
 
   static bool save(JsonBuffer* buffer, JsonVariantRef dest,
-                   const SerializedValue<TString>& source) {
-    const char* dup = makeString(source.data(), source.size()).save(buffer);
-    if (!dup) return false;
-    dest.set(SerializedValue<const char*>(dup, source.size()));
-    return true;
-  }
-
-  static bool save(JsonBuffer* buffer, JsonKey dest,
                    const SerializedValue<TString>& source) {
     const char* dup = makeString(source.data(), source.size()).save(buffer);
     if (!dup) return false;

@@ -17,38 +17,14 @@ struct JsonPairData {
 };
 }  // namespace Internals
 
-class JsonKey {
- public:
-  explicit JsonKey(Internals::JsonPairData* data) : _data(data) {}
-
-  operator const char*() const {
-    return _data->key;
-  }
-
-  void set(const char* key) {
-    _data->key = key;
-  }
-
- private:
-  Internals::JsonPairData* _data;
-};
-
 // A key value pair for JsonObjectData.
 class JsonPair {
  public:
   JsonPair(Internals::JsonPairData* data) : _data(data) {}
   JsonPair() : _data(0) {}
 
-  JsonKey key() {
-    return JsonKey(_data);
-  }
-
   const char* key() const {
     return _data->key;
-  }
-
-  JsonVariantRef value() {
-    return JsonVariantRef(&_data->value);
   }
 
   JsonVariantRef value() const {

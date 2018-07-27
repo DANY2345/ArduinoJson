@@ -16,11 +16,11 @@ TEST_CASE("JsonObject::begin()/end()") {
   SECTION("NonConstIterator") {
     JsonObject::iterator it = obj.begin();
     REQUIRE(obj.end() != it);
-    REQUIRE_THAT(static_cast<const char*>(it->key()), Equals("ab"));
+    REQUIRE_THAT(it->key(), Equals("ab"));
     REQUIRE(12 == it->value());
     ++it;
     REQUIRE(obj.end() != it);
-    REQUIRE_THAT(static_cast<const char*>(it->key()), Equals("cd"));
+    REQUIRE_THAT(it->key(), Equals("cd"));
     REQUIRE(34 == it->value());
     ++it;
     REQUIRE(obj.end() == it);
