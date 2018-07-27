@@ -20,18 +20,20 @@ struct JsonPairData {
 // A key value pair for JsonObjectData.
 class JsonPair {
  public:
-  JsonPair(Internals::JsonPairData* data) : _data(data) {}
-  JsonPair() : _data(0) {}
+  JsonPair(Internals::JsonPairData* data)
+      : _key(data->key), _value(&data->value) {}
+  JsonPair() : _key(0) {}
 
   const char* key() const {
-    return _data->key;
+    return _key;
   }
 
   JsonVariantRef value() const {
-    return JsonVariantRef(&_data->value);
+    return _value;
   }
 
  private:
-  mutable Internals::JsonPairData* _data;
+  const char* _key;
+  JsonVariantRef _value;
 };
 }  // namespace ArduinoJson

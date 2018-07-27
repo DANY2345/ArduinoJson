@@ -30,7 +30,7 @@ class JsonObject;
 // - a reference to a JsonArray or JsonObject
 class JsonVariantRef : public Internals::JsonVariantBase<JsonVariantRef> {
  public:
-  // Creates an uninitialized JsonVariant
+  // Intenal use only
   JsonVariantRef(Internals::JsonVariantData *data) : _data(data) {}
 
   // Creates an uninitialized JsonVariant
