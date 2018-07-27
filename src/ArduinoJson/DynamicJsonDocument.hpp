@@ -13,14 +13,18 @@ namespace ArduinoJson {
 
 class DynamicJsonDocument {
   Internals::DynamicJsonBuffer _buffer;
+  Internals::JsonVariantData _rootData;
   JsonVariant _root;
 
  public:
   uint8_t nestingLimit;
 
-  DynamicJsonDocument() : nestingLimit(ARDUINOJSON_DEFAULT_NESTING_LIMIT) {}
+  DynamicJsonDocument()
+      : _root(&_rootData), nestingLimit(ARDUINOJSON_DEFAULT_NESTING_LIMIT) {}
   DynamicJsonDocument(size_t capacity)
-      : _buffer(capacity), nestingLimit(ARDUINOJSON_DEFAULT_NESTING_LIMIT) {}
+      : _buffer(capacity),
+        _root(&_rootData),
+        nestingLimit(ARDUINOJSON_DEFAULT_NESTING_LIMIT) {}
 
   template <typename T>
   bool is() const {

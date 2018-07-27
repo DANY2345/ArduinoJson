@@ -16,6 +16,7 @@
 namespace ArduinoJson {
 
 inline void JsonVariant::set(const JsonArray& array) {
+  if (!_data) return;
   if (!array.isNull()) {
     _data->type = Internals::JSON_ARRAY;
     _data->content.asArray = array._data;
@@ -29,6 +30,7 @@ inline void JsonVariant::set(const Internals::JsonArraySubscript& value) {
 }
 
 inline void JsonVariant::set(const JsonObject& object) {
+  if (!_data) return;
   if (!object.isNull()) {
     _data->type = Internals::JSON_OBJECT;
     _data->content.asObject = object._data;
@@ -62,17 +64,20 @@ JsonVariant::as() const {
 }
 
 inline JsonArray JsonVariant::variantAsArray() const {
-  if (_data->type == Internals::JSON_ARRAY) return _data->content.asArray;
+  if (_data && _data->type == Internals::JSON_ARRAY)
+    return _data->content.asArray;
   return JsonArray();
 }
 
 inline JsonObject JsonVariant::variantAsObject() const {
-  if (_data->type == Internals::JSON_OBJECT) return _data->content.asObject;
+  if (_data && _data->type == Internals::JSON_OBJECT)
+    return _data->content.asObject;
   return JsonObject();
 }
 
 template <typename T>
 inline T JsonVariant::variantAsInteger() const {
+  if (!_data) return 0;
   using namespace Internals;
   switch (_data->type) {
     case JSON_UNDEFINED:
@@ -92,11 +97,12 @@ inline T JsonVariant::variantAsInteger() const {
 
 inline const char* JsonVariant::variantAsString() const {
   using namespace Internals;
-  return _data->type == JSON_STRING ? _data->content.asString : NULL;
+  return _data && _data->type == JSON_STRING ? _data->content.asString : NULL;
 }
 
 template <typename T>
 inline T JsonVariant::variantAsFloat() const {
+  if (!_data) return 0;
   using namespace Internals;
   switch (_data->type) {
     case JSON_UNDEFINED:
@@ -116,21 +122,22 @@ inline T JsonVariant::variantAsFloat() const {
 
 inline bool JsonVariant::variantIsBoolean() const {
   using namespace Internals;
-  return _data->type == JSON_BOOLEAN;
+  return _data && _data->type == JSON_BOOLEAN;
 }
 
 inline bool JsonVariant::variantIsInteger() const {
   using namespace Internals;
 
-  return _data->type == JSON_POSITIVE_INTEGER ||
-         _data->type == JSON_NEGATIVE_INTEGER;
+  return _data && (_data->type == JSON_POSITIVE_INTEGER ||
+                   _data->type == JSON_NEGATIVE_INTEGER);
 }
 
 inline bool JsonVariant::variantIsFloat() const {
   using namespace Internals;
 
-  return _data->type == JSON_FLOAT || _data->type == JSON_POSITIVE_INTEGER ||
-         _data->type == JSON_NEGATIVE_INTEGER;
+  return _data &&
+         (_data->type == JSON_FLOAT || _data->type == JSON_POSITIVE_INTEGER ||
+          _data->type == JSON_NEGATIVE_INTEGER);
 }
 
 }  // namespace ArduinoJson

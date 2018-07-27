@@ -12,12 +12,14 @@ namespace ArduinoJson {
 template <size_t CAPACITY = sizeof(JsonVariant)>
 class StaticJsonDocument {
   Internals::StaticJsonBuffer<CAPACITY> _buffer;
+  Internals::JsonVariantData _rootData;
   JsonVariant _root;
 
  public:
   uint8_t nestingLimit;
 
-  StaticJsonDocument() : nestingLimit(ARDUINOJSON_DEFAULT_NESTING_LIMIT) {}
+  StaticJsonDocument()
+      : _root(&_rootData), nestingLimit(ARDUINOJSON_DEFAULT_NESTING_LIMIT) {}
 
   Internals::StaticJsonBufferBase& buffer() {
     return _buffer;
