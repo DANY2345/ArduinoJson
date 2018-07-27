@@ -63,8 +63,7 @@ class MsgPackSerializer {
       writeByte(0xDF);
       writeInteger(uint32_t(n));
     }
-    for (JsonObject::const_iterator it = object.begin(); it != object.end();
-         ++it) {
+    for (JsonObject::iterator it = object.begin(); it != object.end(); ++it) {
       acceptString(it->key());
       it->value().visit(*this);
     }

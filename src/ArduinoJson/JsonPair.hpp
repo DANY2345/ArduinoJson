@@ -48,11 +48,11 @@ class JsonPair {
     return JsonVariantRef(&_data.value);
   }
 
-  JsonVariant value() const {
-    return JsonVariant(_data.value);
+  JsonVariantRef value() const {
+    return JsonVariantRef(&_data.value);
   }
 
  private:
-  Internals::JsonPairData _data;
+  mutable Internals::JsonPairData _data;
 };
 }  // namespace ArduinoJson

@@ -39,7 +39,7 @@ class JsonSerializer {
   void acceptObject(const JsonObject &object) {
     _writer.beginObject();
 
-    JsonObject::const_iterator it = object.begin();
+    JsonObject::iterator it = object.begin();
     while (it != object.end()) {
       _writer.writeString(it->key());
       _writer.writeColon();
