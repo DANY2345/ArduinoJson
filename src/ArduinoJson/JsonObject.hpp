@@ -248,7 +248,7 @@ class JsonObject {
     if (!_data) return internal_iterator();
     internal_iterator it;
     for (it = _data->begin(); it != _data->end(); ++it) {
-      if (Internals::makeString(key).equals(it->key())) break;
+      if (Internals::makeString(key).equals(it->key)) break;
     }
     return it;
   }
@@ -261,14 +261,14 @@ class JsonObject {
   typename Internals::JsonVariantAs<TValue>::type get_impl(
       TStringRef key) const {
     internal_iterator it = findKey<TStringRef>(key);
-    return it != _data->end() ? it->value().as<TValue>()
+    return it != _data->end() ? JsonVariantRef(&it->value).as<TValue>()
                               : Internals::JsonVariantDefault<TValue>::get();
   }
 
   template <typename TStringRef, typename TValue>
   bool is_impl(TStringRef key) const {
     internal_iterator it = findKey<TStringRef>(key);
-    return it != _data->end() ? it->value().is<TValue>() : false;
+    return it != _data->end() ? JsonVariantRef(&it->value).is<TValue>() : false;
   }
 
   template <typename TStringRef>
@@ -291,14 +291,14 @@ class JsonObject {
       // TODO: use JsonPairData directly, we don't need an iterator
       it = _data->add();
       if (it == _data->end()) return false;
-      bool key_ok = Internals::ValueSaver<TStringRef>::save(_data->_buffer,
-                                                            it->key(), key);
+      bool key_ok =
+          Internals::ValueSaver<TStringRef>::save(_data->_buffer, it->key, key);
       if (!key_ok) return false;
     }
 
     // save the value
-    return Internals::ValueSaver<TValueRef>::save(_data->_buffer, it->value(),
-                                                  value);
+    return Internals::ValueSaver<TValueRef>::save(
+        _data->_buffer, JsonVariantRef(&it->value), value);
   }
 
   mutable Internals::JsonObjectData* _data;

@@ -11,7 +11,7 @@ namespace ArduinoJson {
 
 // A read-write forward iterator for JsonArray
 class JsonObjectIterator {
-  typedef Internals::ListIterator<JsonPair> internal_iterator;
+  typedef Internals::ListIterator<Internals::JsonPairData> internal_iterator;
 
  public:
   JsonObjectIterator() {}
@@ -19,11 +19,11 @@ class JsonObjectIterator {
       : _iterator(iterator) {}
 
   JsonPair &operator*() const {
-    _pair = JsonPair(*_iterator);
+    _pair = JsonPair(&*_iterator);
     return _pair;
   }
   JsonPair *operator->() {
-    _pair = JsonPair(*_iterator);
+    _pair = JsonPair(&*_iterator);
     return &_pair;
   }
 

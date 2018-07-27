@@ -36,23 +36,26 @@ class JsonKey {
 // A key value pair for JsonObjectData.
 class JsonPair {
  public:
+  JsonPair(Internals::JsonPairData* data) : _data(data) {}
+  JsonPair() : _data(0) {}
+
   JsonKey key() {
-    return JsonKey(&_data);
+    return JsonKey(_data);
   }
 
   const char* key() const {
-    return _data.key;
+    return _data->key;
   }
 
   JsonVariantRef value() {
-    return JsonVariantRef(&_data.value);
+    return JsonVariantRef(&_data->value);
   }
 
   JsonVariantRef value() const {
-    return JsonVariantRef(&_data.value);
+    return JsonVariantRef(&_data->value);
   }
 
  private:
-  mutable Internals::JsonPairData _data;
+  mutable Internals::JsonPairData* _data;
 };
 }  // namespace ArduinoJson
