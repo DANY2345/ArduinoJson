@@ -29,12 +29,12 @@ class MsgPackDeserializer {
     if (!readByte(code)) return DeserializationError::IncompleteInput;
 
     if ((code & 0x80) == 0) {
-      variant = code;
+      variant.set(code);
       return DeserializationError::Ok;
     }
 
     if ((code & 0xe0) == 0xe0) {
-      variant = static_cast<int8_t>(code);
+      variant.set(static_cast<int8_t>(code));
       return DeserializationError::Ok;
     }
 
@@ -48,15 +48,15 @@ class MsgPackDeserializer {
 
     switch (code) {
       case 0xc0:
-        variant = static_cast<char *>(0);
+        variant.set(static_cast<char *>(0));
         return DeserializationError::Ok;
 
       case 0xc2:
-        variant = false;
+        variant.set(false);
         return DeserializationError::Ok;
 
       case 0xc3:
-        variant = true;
+        variant.set(true);
         return DeserializationError::Ok;
 
       case 0xcc:
@@ -174,7 +174,7 @@ class MsgPackDeserializer {
   DeserializationError readInteger(JsonVariant &variant) {
     T value;
     if (!readInteger(value)) return DeserializationError::IncompleteInput;
-    variant = value;
+    variant.set(value);
     return DeserializationError::Ok;
   }
 
@@ -184,7 +184,7 @@ class MsgPackDeserializer {
     T value;
     if (!readBytes(value)) return DeserializationError::IncompleteInput;
     fixEndianess(value);
-    variant = value;
+    variant.set(value);
     return DeserializationError::Ok;
   }
 
@@ -194,7 +194,7 @@ class MsgPackDeserializer {
     T value;
     if (!readBytes(value)) return DeserializationError::IncompleteInput;
     fixEndianess(value);
-    variant = value;
+    variant.set(value);
     return DeserializationError::Ok;
   }
 
@@ -207,7 +207,7 @@ class MsgPackDeserializer {
     if (!readBytes(i, 8)) return DeserializationError::IncompleteInput;
     doubleToFloat(i, o);
     fixEndianess(value);
-    variant = value;
+    variant.set(value);
     return DeserializationError::Ok;
   }
 
@@ -228,7 +228,7 @@ class MsgPackDeserializer {
     }
     const char *s = str.c_str();
     if (s == NULL) return DeserializationError::NoMemory;
-    variant = s;
+    variant.set(s);
     return DeserializationError::Ok;
   }
 
@@ -242,7 +242,7 @@ class MsgPackDeserializer {
   DeserializationError readArray(JsonVariant &variant, size_t n) {
     JsonArray array(_buffer);
     if (array.isNull()) return DeserializationError::NoMemory;
-    variant = array;
+    variant.set(array);
     return readArray(array, n);
   }
 
@@ -269,7 +269,7 @@ class MsgPackDeserializer {
   DeserializationError readObject(JsonVariant &variant, size_t n) {
     JsonObject object(_buffer);
     if (object.isNull()) return DeserializationError::NoMemory;
-    variant = object;
+    variant.set(object);
     return readObject(object, n);
   }
 

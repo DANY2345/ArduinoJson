@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Data\ListIterator.hpp"
-#include "JsonVariantRef.hpp"
+#include "JsonVariant.hpp"
 
 namespace ArduinoJson {
 
@@ -18,12 +18,12 @@ class JsonArrayIterator {
   explicit JsonArrayIterator(internal_iterator iterator)
       : _iterator(iterator) {}
 
-  JsonVariantRef &operator*() const {
-    _variant = JsonVariantRef(&*_iterator);
+  JsonVariant &operator*() const {
+    _variant = JsonVariant(&*_iterator);
     return _variant;
   }
-  JsonVariantRef *operator->() {
-    _variant = JsonVariantRef(&*_iterator);
+  JsonVariant *operator->() {
+    _variant = JsonVariant(&*_iterator);
     return &_variant;
   }
 
@@ -51,6 +51,6 @@ class JsonArrayIterator {
 
  private:
   internal_iterator _iterator;
-  mutable JsonVariantRef _variant;
+  mutable JsonVariant _variant;
 };
 }  // namespace ArduinoJson

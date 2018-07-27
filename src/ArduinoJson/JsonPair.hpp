@@ -5,7 +5,6 @@
 #pragma once
 
 #include "JsonVariant.hpp"
-#include "JsonVariantRef.hpp"
 
 namespace ArduinoJson {
 
@@ -28,12 +27,12 @@ class JsonPair {
     return _key;
   }
 
-  JsonVariantRef value() const {
+  JsonVariant value() const {
     return _value;
   }
 
  private:
   const char* _key;
-  JsonVariantRef _value;
+  JsonVariant _value;
 };
 }  // namespace ArduinoJson

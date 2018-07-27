@@ -6,60 +6,61 @@
 #include <catch.hpp>
 
 TEST_CASE("JsonVariant copy") {
-  JsonVariant _variant1;
-  JsonVariant _variant2;
+  DynamicJsonDocument doc1, doc2;
+  JsonVariant variant1 = doc1.to<JsonVariant>();
+  JsonVariant variant2 = doc2.to<JsonVariant>();
 
   SECTION("IntegersAreCopiedByValue") {
-    _variant1 = 123;
-    _variant2 = _variant1;
-    _variant1 = 456;
+    variant1.set(123);
+    variant2 = variant1;
+    variant1.set(456);
 
-    REQUIRE(123 == _variant2.as<int>());
+    REQUIRE(123 == variant2.as<int>());
   }
 
   SECTION("DoublesAreCopiedByValue") {
-    _variant1 = 123.45;
-    _variant2 = _variant1;
-    _variant1 = 456.78;
+    variant1.set(123.45);
+    variant2 = variant1;
+    variant1.set(456.78);
 
-    REQUIRE(123.45 == _variant2.as<double>());
+    REQUIRE(123.45 == variant2.as<double>());
   }
 
   SECTION("BooleansAreCopiedByValue") {
-    _variant1 = true;
-    _variant2 = _variant1;
-    _variant1 = false;
+    variant1.set(true);
+    variant2 = variant1;
+    variant1.set(false);
 
-    REQUIRE(_variant2.as<bool>());
+    REQUIRE(variant2.as<bool>());
   }
 
   SECTION("StringsAreCopiedByValue") {
-    _variant1 = "hello";
-    _variant2 = _variant1;
-    _variant1 = "world";
+    variant1.set("hello");
+    variant2 = variant1;
+    variant1.set("world");
 
-    REQUIRE(std::string("hello") == _variant2.as<const char*>());
+    REQUIRE(std::string("hello") == variant2.as<const char*>());
   }
 
   SECTION("ObjectsAreCopiedByReference") {
     DynamicJsonDocument doc;
     JsonObject object = doc.to<JsonObject>();
 
-    _variant1 = object;
+    variant1.set(object);
 
     object["hello"] = "world";
 
-    REQUIRE(1 == _variant1.as<JsonObject>().size());
+    REQUIRE(1 == variant1.as<JsonObject>().size());
   }
 
   SECTION("ArraysAreCopiedByReference") {
     DynamicJsonDocument doc;
     JsonArray array = doc.to<JsonArray>();
 
-    _variant1 = array;
+    variant1.set(array);
 
     array.add("world");
 
-    REQUIRE(1 == _variant1.as<JsonArray>().size());
+    REQUIRE(1 == variant1.as<JsonArray>().size());
   }
 }

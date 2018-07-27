@@ -6,9 +6,12 @@
 #include <catch.hpp>
 #include <limits>
 
-void check(JsonVariant variant, const std::string &expected) {
+template <typename T>
+void check(T value, const std::string &expected) {
+  DynamicJsonDocument doc;
+  doc.to<JsonVariant>().set(value);
   char buffer[256] = "";
-  size_t returnValue = serializeJson(variant, buffer, sizeof(buffer));
+  size_t returnValue = serializeJson(doc, buffer, sizeof(buffer));
   REQUIRE(expected == buffer);
   REQUIRE(expected.size() == returnValue);
 }

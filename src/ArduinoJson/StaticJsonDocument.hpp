@@ -40,7 +40,7 @@ class StaticJsonDocument {
   to() {
     clear();
     JsonObject object(&_buffer);
-    _root = object;
+    _root.set(object);
     return object;
   }
 
@@ -51,7 +51,7 @@ class StaticJsonDocument {
   to() {
     clear();
     JsonArray array(&_buffer);
-    _root = array;
+    _root.set(array);
     return array;
   }
 

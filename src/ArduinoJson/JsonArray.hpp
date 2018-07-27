@@ -17,7 +17,6 @@ class JsonArraySubscript;
 
 class JsonArray {
   friend class JsonVariant;
-  friend class JsonVariantRef;
 
  public:
   typedef JsonArrayIterator iterator;

@@ -6,7 +6,6 @@
 
 #include "../JsonPair.hpp"
 #include "../JsonVariant.hpp"
-#include "../JsonVariantRef.hpp"
 #include "../Memory/JsonBuffer.hpp"
 #include "../Polyfills/type_traits.hpp"
 #include "../Strings/StringTypes.hpp"
@@ -22,7 +21,7 @@ struct ValueSaver {
     return true;
   }
 
-  static bool save(JsonBuffer*, JsonVariantRef destination, Source source) {
+  static bool save(JsonBuffer*, JsonVariant destination, Source source) {
     destination.set(source);
     return true;
   }
@@ -41,7 +40,7 @@ struct ValueSaver<
     return true;
   }
 
-  static bool save(JsonBuffer* buffer, JsonVariantRef dest, TString source) {
+  static bool save(JsonBuffer* buffer, JsonVariant dest, TString source) {
     const char* dup = makeString(source).save(buffer);
     dest.set(dup);
     return dup != NULL;
@@ -62,7 +61,7 @@ struct ValueSaver<
     return true;
   }
 
-  static bool save(JsonBuffer* buffer, JsonVariantRef dest,
+  static bool save(JsonBuffer* buffer, JsonVariant dest,
                    const SerializedValue<TString>& source) {
     const char* dup = makeString(source.data(), source.size()).save(buffer);
     if (!dup) return false;

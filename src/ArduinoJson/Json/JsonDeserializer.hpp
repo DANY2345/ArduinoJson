@@ -7,6 +7,8 @@
 #include "../Deserialization/deserialize.hpp"
 #include "../JsonVariant.hpp"
 #include "../Memory/JsonBuffer.hpp"
+#include "../Numbers/isFloat.hpp"
+#include "../Numbers/isInteger.hpp"
 #include "../Polyfills/type_traits.hpp"
 #include "./EscapeSequence.hpp"
 
@@ -68,7 +70,7 @@ class JsonDeserializer {
 
     JsonArray array(_buffer);
     if (array.isNull()) return DeserializationError::NoMemory;
-    variant = array;
+    variant.set(array);
 
     // Check opening braket
     if (!eat('[')) return DeserializationError::InvalidInput;
@@ -105,7 +107,7 @@ class JsonDeserializer {
 
     JsonObject object(_buffer);
     if (object.isNull()) return DeserializationError::NoMemory;
-    variant = object;
+    variant.set(object);
 
     // Check opening brace
     if (!eat('{')) return DeserializationError::InvalidInput;
@@ -171,7 +173,7 @@ class JsonDeserializer {
     const char *value;
     DeserializationError err = parseQuotedString(&value);
     if (err) return err;
-    variant = value;
+    variant.set(value);
     return DeserializationError::Ok;
   }
 
@@ -242,15 +244,15 @@ class JsonDeserializer {
     buffer[n] = 0;
 
     if (isInteger(buffer)) {
-      result = parseInteger<JsonInteger>(buffer);
+      result.set(parseInteger<JsonInteger>(buffer));
     } else if (isFloat(buffer)) {
-      result = parseFloat<JsonFloat>(buffer);
+      result.set(parseFloat<JsonFloat>(buffer));
     } else if (!strcmp(buffer, "true")) {
-      result = true;
+      result.set(true);
     } else if (!strcmp(buffer, "false")) {
-      result = false;
+      result.set(false);
     } else if (!strcmp(buffer, "null")) {
-      result = static_cast<const char *>(0);
+      result.set(static_cast<const char *>(0));
     } else {
       return DeserializationError::InvalidInput;
     }

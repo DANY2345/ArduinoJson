@@ -39,7 +39,7 @@ class DynamicJsonDocument {
   to() {
     clear();
     JsonObject object(&_buffer);
-    _root = object;
+    _root.set(object);
     return object;
   }
 
@@ -50,7 +50,7 @@ class DynamicJsonDocument {
   to() {
     clear();
     JsonArray array(&_buffer);
-    _root = array;
+    _root.set(array);
     return array;
   }
 
