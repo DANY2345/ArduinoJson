@@ -18,13 +18,11 @@ class JsonObjectIterator {
   explicit JsonObjectIterator(internal_iterator iterator)
       : _iterator(iterator) {}
 
-  JsonPair &operator*() const {
-    _pair = JsonPair(&*_iterator);
-    return _pair;
+  JsonPair operator*() const {
+    return JsonPair(&*_iterator);
   }
-  JsonPair *operator->() {
-    _pair = JsonPair(&*_iterator);
-    return &_pair;
+  JsonPairPtr operator->() {
+    return JsonPairPtr(&*_iterator);
   }
 
   bool operator==(const JsonObjectIterator &other) const {
@@ -51,6 +49,5 @@ class JsonObjectIterator {
 
  private:
   internal_iterator _iterator;
-  mutable JsonPair _pair;
 };
 }  // namespace ArduinoJson
