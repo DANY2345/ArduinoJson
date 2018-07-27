@@ -284,10 +284,10 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
         return visitor.acceptFloat(_data->content.asFloat);
 
       case JSON_ARRAY:
-        return visitor.acceptArray(_data->content.asArray);
+        return visitor.acceptArray(JsonArray(_data->content.asArray));
 
       case JSON_OBJECT:
-        return visitor.acceptObject(_data->content.asObject);
+        return visitor.acceptObject(JsonObject(_data->content.asObject));
 
       case JSON_STRING:
         return visitor.acceptString(_data->content.asString);

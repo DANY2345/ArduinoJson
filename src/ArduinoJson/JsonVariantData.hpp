@@ -6,7 +6,6 @@
 
 #include "Data/JsonVariantContent.hpp"
 #include "Data/JsonVariantType.hpp"
-#include "Memory/JsonBufferAllocated.hpp"
 
 namespace ArduinoJson {
 

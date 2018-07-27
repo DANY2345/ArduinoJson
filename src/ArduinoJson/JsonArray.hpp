@@ -22,8 +22,8 @@ class JsonArray {
   typedef JsonArrayIterator iterator;
 
   JsonArray() : _data(0) {}
-  JsonArray(Internals::JsonArrayData* arr) : _data(arr) {}
-  JsonArray(Internals::JsonBuffer* buf)
+  explicit JsonArray(Internals::JsonArrayData* arr) : _data(arr) {}
+  explicit JsonArray(Internals::JsonBuffer* buf)
       : _data(new (buf) Internals::JsonArrayData(buf)) {}
 
   // Adds the specified value at the end of the array.

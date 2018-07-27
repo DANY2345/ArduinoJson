@@ -25,7 +25,7 @@ class JsonDeserializer {
         _stringStorage(stringStorage),
         _nestingLimit(nestingLimit),
         _loaded(false) {}
-  DeserializationError parse(JsonVariant &variant) {
+  DeserializationError parse(JsonVariant variant) {
     DeserializationError err = skipSpacesAndComments();
     if (err) return err;
 
@@ -85,7 +85,8 @@ class JsonDeserializer {
     // Read each value
     for (;;) {
       // 1 - Parse value
-      JsonVariant value;
+      JsonVariantData variantData;
+      JsonVariant value(&variantData);
       _nestingLimit--;
       err = parse(value);
       _nestingLimit++;
@@ -132,7 +133,8 @@ class JsonDeserializer {
       if (!eat(':')) return DeserializationError::InvalidInput;
 
       // Parse value
-      JsonVariant value;
+      JsonVariantData variantData;
+      JsonVariant value(&variantData);
       _nestingLimit--;
       err = parse(value);
       _nestingLimit++;

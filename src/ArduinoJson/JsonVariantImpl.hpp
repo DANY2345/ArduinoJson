@@ -65,13 +65,13 @@ JsonVariant::as() const {
 
 inline JsonArray JsonVariant::variantAsArray() const {
   if (_data && _data->type == Internals::JSON_ARRAY)
-    return _data->content.asArray;
+    return JsonArray(_data->content.asArray);
   return JsonArray();
 }
 
 inline JsonObject JsonVariant::variantAsObject() const {
   if (_data && _data->type == Internals::JSON_OBJECT)
-    return _data->content.asObject;
+    return JsonObject(_data->content.asObject);
   return JsonObject();
 }
 

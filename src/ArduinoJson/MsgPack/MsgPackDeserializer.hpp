@@ -24,7 +24,7 @@ class MsgPackDeserializer {
         _stringStorage(stringStorage),
         _nestingLimit(nestingLimit) {}
 
-  DeserializationError parse(JsonVariant &variant) {
+  DeserializationError parse(JsonVariant variant) {
     uint8_t code;
     if (!readByte(code)) return DeserializationError::IncompleteInput;
 
@@ -250,7 +250,8 @@ class MsgPackDeserializer {
     if (_nestingLimit == 0) return DeserializationError::TooDeep;
     --_nestingLimit;
     for (; n; --n) {
-      JsonVariant variant;
+      JsonVariantData _data;
+      JsonVariant variant(&_data);
       DeserializationError err = parse(variant);
       if (err) return err;
       if (!array.add(variant)) return DeserializationError::NoMemory;
@@ -278,7 +279,8 @@ class MsgPackDeserializer {
     --_nestingLimit;
     for (; n; --n) {
       DeserializationError err;
-      JsonVariant variant;
+      JsonVariantData _data;
+      JsonVariant variant(&_data);
       err = parse(variant);
       if (err) return err;
       const char *key = variant.as<char *>();

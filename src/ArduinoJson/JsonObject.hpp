@@ -17,8 +17,8 @@ class JsonObject {
   typedef JsonObjectIterator iterator;
 
   JsonObject() : _data(0) {}
-  JsonObject(Internals::JsonObjectData* object) : _data(object) {}
-  JsonObject(Internals::JsonBuffer* buf)
+  explicit JsonObject(Internals::JsonObjectData* object) : _data(object) {}
+  explicit JsonObject(Internals::JsonBuffer* buf)
       : _data(new (buf) Internals::JsonObjectData(buf)) {}
 
   iterator begin() const {
