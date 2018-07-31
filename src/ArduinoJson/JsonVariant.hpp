@@ -7,10 +7,10 @@
 #include <stddef.h>
 #include <stdint.h>  // for uint8_t
 
+#include "Data/JsonVariantData.hpp"
 #include "Data/JsonVariantDefault.hpp"
 #include "JsonVariant.hpp"
 #include "JsonVariantBase.hpp"
-#include "JsonVariantData.hpp"
 #include "Polyfills/type_traits.hpp"
 #include "Serialization/DynamicStringWriter.hpp"
 #include "SerializedValue.hpp"

@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "Data/JsonVariantContent.hpp"
-#include "Data/JsonVariantType.hpp"
+#include "JsonVariantContent.hpp"
+#include "JsonVariantType.hpp"
 
 namespace ArduinoJson {
-
 namespace Internals {
+
 struct JsonVariantData {
   JsonVariantType type;
   JsonVariantContent content;
