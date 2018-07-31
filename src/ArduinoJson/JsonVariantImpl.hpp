@@ -17,12 +17,7 @@ namespace ArduinoJson {
 
 inline void JsonVariant::set(const JsonArray& array) {
   if (!_data) return;
-  if (!array.isNull()) {
-    _data->type = Internals::JSON_ARRAY;
-    _data->content.asArray = array._data;
-  } else {
-    _data->type = Internals::JSON_UNDEFINED;
-  }
+  _data->set(array._data);
 }
 
 inline void JsonVariant::set(const Internals::JsonArraySubscript& value) {
@@ -31,12 +26,7 @@ inline void JsonVariant::set(const Internals::JsonArraySubscript& value) {
 
 inline void JsonVariant::set(const JsonObject& object) {
   if (!_data) return;
-  if (!object.isNull()) {
-    _data->type = Internals::JSON_OBJECT;
-    _data->content.asObject = object._data;
-  } else {
-    _data->type = Internals::JSON_UNDEFINED;
-  }
+  _data->set(object._data);
 }
 
 template <typename TString>
