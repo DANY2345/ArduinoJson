@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "../Numbers/parseFloat.hpp"
+#include "../Numbers/parseInteger.hpp"
 #include "../Polyfills/type_traits.hpp"
 #include "../SerializedValue.hpp"
 #include "JsonVariantContent.hpp"
@@ -105,6 +107,54 @@ struct JsonVariantData {
     } else {
       type = JSON_UNDEFINED;
     }
+  }
+
+  JsonArrayData *asArray() const {
+    return type == JSON_ARRAY ? content.asArray : 0;
+  }
+
+  JsonObjectData *asObject() const {
+    return type == JSON_OBJECT ? content.asObject : 0;
+  }
+
+  template <typename T>
+  T asInteger() const {
+    switch (type) {
+      case JSON_UNDEFINED:
+      case JSON_UNPARSED:
+        return 0;
+      case JSON_POSITIVE_INTEGER:
+      case JSON_BOOLEAN:
+        return T(content.asInteger);
+      case JSON_NEGATIVE_INTEGER:
+        return T(~content.asInteger + 1);
+      case JSON_STRING:
+        return parseInteger<T>(content.asString);
+      default:
+        return T(content.asFloat);
+    }
+  }
+
+  template <typename T>
+  T asFloat() const {
+    switch (type) {
+      case JSON_UNDEFINED:
+      case JSON_UNPARSED:
+        return 0;
+      case JSON_POSITIVE_INTEGER:
+      case JSON_BOOLEAN:
+        return static_cast<T>(content.asInteger);
+      case JSON_NEGATIVE_INTEGER:
+        return -static_cast<T>(content.asInteger);
+      case JSON_STRING:
+        return parseFloat<T>(content.asString);
+      default:
+        return static_cast<T>(content.asFloat);
+    }
+  }
+
+  const char *asString() const {
+    return type == JSON_STRING ? content.asString : NULL;
   }
 };
 }  // namespace Internals

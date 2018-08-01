@@ -41,7 +41,7 @@ inline typename Internals::enable_if<
                        JsonArray>::value,
     JsonArray>::type
 JsonVariant::as() const {
-  return variantAsArray();
+  return _data ? JsonArray(_data->asArray()) : JsonArray();
 }
 
 template <typename T>
@@ -50,64 +50,7 @@ inline typename Internals::enable_if<
                        JsonObject>::value,
     T>::type
 JsonVariant::as() const {
-  return variantAsObject();
-}
-
-inline JsonArray JsonVariant::variantAsArray() const {
-  if (_data && _data->type == Internals::JSON_ARRAY)
-    return JsonArray(_data->content.asArray);
-  return JsonArray();
-}
-
-inline JsonObject JsonVariant::variantAsObject() const {
-  if (_data && _data->type == Internals::JSON_OBJECT)
-    return JsonObject(_data->content.asObject);
-  return JsonObject();
-}
-
-template <typename T>
-inline T JsonVariant::variantAsInteger() const {
-  if (!_data) return 0;
-  using namespace Internals;
-  switch (_data->type) {
-    case JSON_UNDEFINED:
-    case JSON_UNPARSED:
-      return 0;
-    case JSON_POSITIVE_INTEGER:
-    case JSON_BOOLEAN:
-      return T(_data->content.asInteger);
-    case JSON_NEGATIVE_INTEGER:
-      return T(~_data->content.asInteger + 1);
-    case JSON_STRING:
-      return parseInteger<T>(_data->content.asString);
-    default:
-      return T(_data->content.asFloat);
-  }
-}
-
-inline const char* JsonVariant::variantAsString() const {
-  using namespace Internals;
-  return _data && _data->type == JSON_STRING ? _data->content.asString : NULL;
-}
-
-template <typename T>
-inline T JsonVariant::variantAsFloat() const {
-  if (!_data) return 0;
-  using namespace Internals;
-  switch (_data->type) {
-    case JSON_UNDEFINED:
-    case JSON_UNPARSED:
-      return 0;
-    case JSON_POSITIVE_INTEGER:
-    case JSON_BOOLEAN:
-      return static_cast<T>(_data->content.asInteger);
-    case JSON_NEGATIVE_INTEGER:
-      return -static_cast<T>(_data->content.asInteger);
-    case JSON_STRING:
-      return parseFloat<T>(_data->content.asString);
-    default:
-      return static_cast<T>(_data->content.asFloat);
-  }
+  return _data ? JsonObject(_data->asObject()) : JsonObject();
 }
 
 inline bool JsonVariant::variantIsBoolean() const {

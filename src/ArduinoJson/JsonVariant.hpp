@@ -86,14 +86,14 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   template <typename T>
   const typename Internals::enable_if<Internals::is_integral<T>::value, T>::type
   as() const {
-    return variantAsInteger<T>();
+    return _data ? _data->asInteger<T>() : 0;
   }
   // bool as<bool>() const
   template <typename T>
   const typename Internals::enable_if<Internals::is_same<T, bool>::value,
                                       T>::type
   as() const {
-    return variantAsInteger<int>() != 0;
+    return _data && _data->asInteger<T>() != 0;
   }
   //
   // double as<double>() const;
@@ -102,7 +102,7 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   const typename Internals::enable_if<Internals::is_floating_point<T>::value,
                                       T>::type
   as() const {
-    return variantAsFloat<T>();
+    return _data ? _data->asFloat<T>() : 0;
   }
   //
   // const char* as<const char*>() const;
@@ -112,7 +112,7 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
                                     Internals::is_same<T, char *>::value,
                                 const char *>::type
   as() const {
-    return variantAsString();
+    return _data ? _data->asString() : 0;
   }
   //
   // std::string as<std::string>() const;
@@ -120,7 +120,7 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   template <typename T>
   typename Internals::enable_if<Internals::IsWriteableString<T>::value, T>::type
   as() const {
-    const char *cstr = variantAsString();
+    const char *cstr = _data ? _data->asString() : 0;
     if (cstr) return T(cstr);
     T s;
     serializeJson(*this, s);
