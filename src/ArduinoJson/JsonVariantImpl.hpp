@@ -17,7 +17,10 @@ namespace ArduinoJson {
 
 inline void JsonVariant::set(const JsonArray& array) {
   if (!_data) return;
-  _data->set(array._data);
+  if (array._data)
+    _data->setArray(*array._data);
+  else
+    _data->setUndefined();
 }
 
 inline void JsonVariant::set(const Internals::JsonArraySubscript& value) {
@@ -26,7 +29,10 @@ inline void JsonVariant::set(const Internals::JsonArraySubscript& value) {
 
 inline void JsonVariant::set(const JsonObject& object) {
   if (!_data) return;
-  _data->set(object._data);
+  if (object._data)
+    _data->setObject(*object._data);
+  else
+    _data->setUndefined();
 }
 
 template <typename TString>

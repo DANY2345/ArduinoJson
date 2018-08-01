@@ -11,7 +11,9 @@
 #include "Data/JsonVariantDefault.hpp"
 #include "JsonVariant.hpp"
 #include "JsonVariantBase.hpp"
+#include "Polyfills/type_traits.hpp"
 #include "Serialization/DynamicStringWriter.hpp"
+#include "SerializedValue.hpp"
 
 namespace ArduinoJson {
 
@@ -35,35 +37,71 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   JsonVariant() : _data(0) {}
 
   // set(bool value)
+  void set(bool value) {
+    if (!_data) return;
+    _data->setBoolean(value);
+  }
+
   // set(double value);
   // set(float value);
+  template <typename T>
+  void set(T value, typename Internals::enable_if<
+                        Internals::is_floating_point<T>::value>::type * = 0) {
+    if (!_data) return;
+    _data->setFloat(static_cast<Internals::JsonFloat>(value));
+  }
+
   // set(char)
   // set(signed short)
   // set(signed int)
   // set(signed long)
   // set(signed char)
+  template <typename T>
+  void set(T value,
+           typename Internals::enable_if<Internals::is_integral<T>::value &&
+                                         Internals::is_signed<T>::value>::type
+               * = 0) {
+    if (!_data) return;
+    if (value >= 0)
+      _data->setPostiveInteger(static_cast<Internals::JsonUInt>(value));
+    else
+      _data->setNegativeInteger(~static_cast<Internals::JsonUInt>(value) + 1);
+  }
+
   // set(unsigned short)
   // set(unsigned int)
   // set(unsigned long)
-  // set(SerializedValue<const char *>)
   template <typename T>
-  void set(const T &value) {
+  void set(T value,
+           typename Internals::enable_if<Internals::is_integral<T>::value &&
+                                         Internals::is_unsigned<T>::value>::type
+               * = 0) {
     if (!_data) return;
-    _data->set(value);
+    _data->setPostiveInteger(static_cast<Internals::JsonUInt>(value));
+  }
+
+  // set(SerializedValue<const char *>)
+  void set(Internals::SerializedValue<const char *> value) {
+    if (!_data) return;
+    _data->setRaw(value.data(), value.size());
   }
 
   // set(const char*);
   // set(const signed char*);
   // set(const unsigned char*);
   template <typename TChar>
-  void set(const TChar *value) {
+  void set(const TChar *value,
+           typename Internals::enable_if<sizeof(TChar) == 1>::type * = 0) {
     if (!_data) return;
-    _data->set(value);
+    _data->setString(reinterpret_cast<const char *>(value));
   }
 
   void set(JsonVariant value) {
     if (!_data) return;
-    _data->set(value._data);
+    if (value._data)
+      *_data = *value._data;
+    else
+      _data->setUndefined();
   }
 
   void set(const JsonArray &array);
@@ -234,5 +272,5 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
 
  private:
   Internals::JsonVariantData *_data;
-};
+};  // namespace ArduinoJson
 }  // namespace ArduinoJson
