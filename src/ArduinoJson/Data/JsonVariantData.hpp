@@ -157,6 +157,31 @@ struct JsonVariantData {
     return type == JSON_STRING ? content.asString : NULL;
   }
 
+  bool isBoolean() const {
+    return type == JSON_BOOLEAN;
+  }
+
+  bool isInteger() const {
+    return type == JSON_POSITIVE_INTEGER || type == JSON_NEGATIVE_INTEGER;
+  }
+
+  bool isFloat() const {
+    using namespace Internals;
+
+    return type == JSON_FLOAT || type == JSON_POSITIVE_INTEGER ||
+           type == JSON_NEGATIVE_INTEGER;
+  }
+
+  bool isArray() const {
+    return type == Internals::JSON_ARRAY;
+  }
+  bool isObject() const {
+    return type == Internals::JSON_OBJECT;
+  }
+  bool isString() const {
+    return type == Internals::JSON_STRING;
+  }
+
   template <typename Visitor>
   void visit(Visitor &visitor) const {
     switch (type) {

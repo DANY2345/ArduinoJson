@@ -168,7 +168,7 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   template <typename T>
   typename Internals::enable_if<Internals::is_integral<T>::value, bool>::type
   is() const {
-    return variantIsInteger();
+    return _data && _data->isInteger();
   }
   //
   // bool is<double>() const;
@@ -177,14 +177,14 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   typename Internals::enable_if<Internals::is_floating_point<T>::value,
                                 bool>::type
   is() const {
-    return variantIsFloat();
+    return _data && _data->isFloat();
   }
   //
   // bool is<bool>() const
   template <typename T>
   typename Internals::enable_if<Internals::is_same<T, bool>::value, bool>::type
   is() const {
-    return variantIsBoolean();
+    return _data && _data->isBoolean();
   }
   //
   // bool is<const char*>() const;
@@ -194,7 +194,7 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
                                     Internals::is_same<T, char *>::value,
                                 bool>::type
   is() const {
-    return variantIsString();
+    return _data && _data->isString();
   }
   //
   // bool is<JsonArray> const;
@@ -205,7 +205,7 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
                          JsonArray>::value,
       bool>::type
   is() const {
-    return variantIsArray();
+    return _data && _data->isArray();
   }
   //
   // bool is<JsonObject> const;
@@ -216,7 +216,7 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
                          JsonObject>::value,
       bool>::type
   is() const {
-    return variantIsObject();
+    return _data && _data->isObject();
   }
 
   // Returns true if the variant has a value
@@ -233,19 +233,6 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   }
 
  private:
-  bool variantIsBoolean() const;
-  bool variantIsFloat() const;
-  bool variantIsInteger() const;
-  bool variantIsArray() const {
-    return _data && _data->type == Internals::JSON_ARRAY;
-  }
-  bool variantIsObject() const {
-    return _data && _data->type == Internals::JSON_OBJECT;
-  }
-  bool variantIsString() const {
-    return _data && _data->type == Internals::JSON_STRING;
-  }
-
   Internals::JsonVariantData *_data;
 };
 }  // namespace ArduinoJson

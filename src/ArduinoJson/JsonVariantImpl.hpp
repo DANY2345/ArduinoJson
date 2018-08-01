@@ -52,25 +52,4 @@ inline typename Internals::enable_if<
 JsonVariant::as() const {
   return _data ? JsonObject(_data->asObject()) : JsonObject();
 }
-
-inline bool JsonVariant::variantIsBoolean() const {
-  using namespace Internals;
-  return _data && _data->type == JSON_BOOLEAN;
-}
-
-inline bool JsonVariant::variantIsInteger() const {
-  using namespace Internals;
-
-  return _data && (_data->type == JSON_POSITIVE_INTEGER ||
-                   _data->type == JSON_NEGATIVE_INTEGER);
-}
-
-inline bool JsonVariant::variantIsFloat() const {
-  using namespace Internals;
-
-  return _data &&
-         (_data->type == JSON_FLOAT || _data->type == JSON_POSITIVE_INTEGER ||
-          _data->type == JSON_NEGATIVE_INTEGER);
-}
-
 }  // namespace ArduinoJson
