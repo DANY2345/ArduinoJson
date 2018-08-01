@@ -224,9 +224,9 @@ class JsonObject {
   template <typename Visitor>
   void visit(Visitor& visitor) const {
     if (_data)
-      visitor.acceptObject(*this);
+      visitor.acceptObject(*_data);
     else
-      return visitor.acceptNull();
+      visitor.acceptNull();
   }
 
  private:

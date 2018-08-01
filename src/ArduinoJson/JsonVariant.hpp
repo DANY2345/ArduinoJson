@@ -226,48 +226,13 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
 
   template <typename Visitor>
   void visit(Visitor &visitor) const {
-    if (!_data) return visitor.acceptNull();
-
-    using namespace Internals;
-    switch (_data->type) {
-      case JSON_FLOAT:
-        return visitor.acceptFloat(_data->content.asFloat);
-
-      case JSON_ARRAY:
-        return visitor.acceptArray(JsonArray(_data->content.asArray));
-
-      case JSON_OBJECT:
-        return visitor.acceptObject(JsonObject(_data->content.asObject));
-
-      case JSON_STRING:
-        return visitor.acceptString(_data->content.asString);
-
-      case JSON_UNPARSED:
-        return visitor.acceptRawJson(_data->content.asRaw.data,
-                                     _data->content.asRaw.size);
-
-      case JSON_NEGATIVE_INTEGER:
-        return visitor.acceptNegativeInteger(_data->content.asInteger);
-
-      case JSON_POSITIVE_INTEGER:
-        return visitor.acceptPositiveInteger(_data->content.asInteger);
-
-      case JSON_BOOLEAN:
-        return visitor.acceptBoolean(_data->content.asInteger != 0);
-
-      default:  // JSON_UNDEFINED
-        return visitor.acceptNull();
-    }
+    if (_data)
+      _data->visit(visitor);
+    else
+      visitor.acceptNull();
   }
 
  private:
-  JsonArray variantAsArray() const;
-  JsonObject variantAsObject() const;
-  const char *variantAsString() const;
-  template <typename T>
-  T variantAsFloat() const;
-  template <typename T>
-  T variantAsInteger() const;
   bool variantIsBoolean() const;
   bool variantIsFloat() const;
   bool variantIsInteger() const;

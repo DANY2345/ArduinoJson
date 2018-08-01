@@ -156,6 +156,38 @@ struct JsonVariantData {
   const char *asString() const {
     return type == JSON_STRING ? content.asString : NULL;
   }
+
+  template <typename Visitor>
+  void visit(Visitor &visitor) const {
+    switch (type) {
+      case JSON_FLOAT:
+        return visitor.acceptFloat(content.asFloat);
+
+      case JSON_ARRAY:
+        return visitor.acceptArray(*content.asArray);
+
+      case JSON_OBJECT:
+        return visitor.acceptObject(*content.asObject);
+
+      case JSON_STRING:
+        return visitor.acceptString(content.asString);
+
+      case JSON_UNPARSED:
+        return visitor.acceptRawJson(content.asRaw.data, content.asRaw.size);
+
+      case JSON_NEGATIVE_INTEGER:
+        return visitor.acceptNegativeInteger(content.asInteger);
+
+      case JSON_POSITIVE_INTEGER:
+        return visitor.acceptPositiveInteger(content.asInteger);
+
+      case JSON_BOOLEAN:
+        return visitor.acceptBoolean(content.asInteger != 0);
+
+      default:  // JSON_UNDEFINED
+        return visitor.acceptNull();
+    }
+  }
 };
 }  // namespace Internals
 }  // namespace ArduinoJson

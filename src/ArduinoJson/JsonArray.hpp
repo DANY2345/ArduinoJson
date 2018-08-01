@@ -173,7 +173,7 @@ class JsonArray {
   template <typename Visitor>
   void visit(Visitor& visitor) const {
     if (_data)
-      return visitor.acceptArray(*this);
+      visitor.acceptArray(*_data);
     else
       visitor.acceptNull();
   }
