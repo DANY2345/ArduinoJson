@@ -11,6 +11,7 @@
 #include "Data/JsonVariantDefault.hpp"
 #include "JsonVariant.hpp"
 #include "JsonVariantBase.hpp"
+#include "Memory/JsonBuffer.hpp"
 #include "Polyfills/type_traits.hpp"
 #include "Serialization/DynamicStringWriter.hpp"
 #include "SerializedValue.hpp"
@@ -31,10 +32,12 @@ class JsonObject;
 class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
  public:
   // Intenal use only
-  explicit JsonVariant(Internals::JsonVariantData *data) : _data(data) {}
+  explicit JsonVariant(Internals::JsonBuffer *buffer,
+                       Internals::JsonVariantData *data)
+      : _buffer(buffer), _data(data) {}
 
   // Creates an uninitialized JsonVariant
-  JsonVariant() : _data(0) {}
+  JsonVariant() : _buffer(0), _data(0) {}
 
   // set(bool value)
   void set(bool value) {
@@ -271,6 +274,7 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   }
 
  private:
+  Internals::JsonBuffer *_buffer;
   Internals::JsonVariantData *_data;
 };  // namespace ArduinoJson
 }  // namespace ArduinoJson

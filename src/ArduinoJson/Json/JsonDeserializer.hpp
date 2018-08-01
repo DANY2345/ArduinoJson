@@ -86,7 +86,7 @@ class JsonDeserializer {
     for (;;) {
       // 1 - Parse value
       JsonVariantData variantData;
-      JsonVariant value(&variantData);
+      JsonVariant value(_buffer, &variantData);  // TODO: remove
       _nestingLimit--;
       err = parse(value);
       _nestingLimit++;
@@ -134,7 +134,7 @@ class JsonDeserializer {
 
       // Parse value
       JsonVariantData variantData;
-      JsonVariant value(&variantData);
+      JsonVariant value(_buffer, &variantData);
       _nestingLimit--;
       err = parse(value);
       _nestingLimit++;

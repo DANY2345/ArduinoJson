@@ -251,7 +251,7 @@ class MsgPackDeserializer {
     --_nestingLimit;
     for (; n; --n) {
       JsonVariantData _data;
-      JsonVariant variant(&_data);
+      JsonVariant variant(_buffer, &_data);
       DeserializationError err = parse(variant);
       if (err) return err;
       if (!array.add(variant)) return DeserializationError::NoMemory;
@@ -280,7 +280,7 @@ class MsgPackDeserializer {
     for (; n; --n) {
       DeserializationError err;
       JsonVariantData _data;
-      JsonVariant variant(&_data);
+      JsonVariant variant(_buffer, &_data);
       err = parse(variant);
       if (err) return err;
       const char *key = variant.as<char *>();

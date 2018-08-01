@@ -46,7 +46,7 @@ class JsonArray {
 
   iterator begin() const {
     if (!_data) return iterator();
-    return iterator(_data->begin());
+    return iterator(_data->_buffer, _data->begin());
   }
 
   iterator end() const {
@@ -189,7 +189,7 @@ class JsonArray {
   template <typename TValueRef>
   bool add_impl(TValueRef value) {
     if (!_data) return false;
-    iterator it = iterator(_data->add());
+    iterator it = iterator(_data->_buffer, _data->add());
     if (it == end()) return false;
     return Internals::ValueSaver<TValueRef>::save(_data->_buffer, *it, value);
   }

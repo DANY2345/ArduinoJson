@@ -11,7 +11,7 @@ namespace ArduinoJson {
 
 template <size_t CAPACITY>
 class StaticJsonDocument {
-  Internals::StaticJsonBuffer<CAPACITY> _buffer;
+  mutable Internals::StaticJsonBuffer<CAPACITY> _buffer;
   mutable Internals::JsonVariantData _rootData;
 
  public:
@@ -25,12 +25,12 @@ class StaticJsonDocument {
 
   template <typename T>
   bool is() const {
-    return JsonVariant(&_rootData).is<T>();
+    return JsonVariant(&_buffer, &_rootData).is<T>();
   }
 
   template <typename T>
   typename Internals::JsonVariantAs<T>::type as() const {
-    return JsonVariant(&_rootData).as<T>();
+    return JsonVariant(&_buffer, &_rootData).as<T>();
   }
 
   // JsonObject to<JsonObject>()
@@ -40,7 +40,7 @@ class StaticJsonDocument {
   to() {
     clear();
     JsonObject object(&_buffer);
-    JsonVariant(&_rootData).set(object);
+    as<JsonVariant>().set(object);
     return object;
   }
 
@@ -51,7 +51,7 @@ class StaticJsonDocument {
   to() {
     clear();
     JsonArray array(&_buffer);
-    JsonVariant(&_rootData).set(array);
+    as<JsonVariant>().set(array);
     return array;
   }
 
@@ -61,7 +61,7 @@ class StaticJsonDocument {
                                 JsonVariant>::type
   to() {
     clear();
-    return JsonVariant(&_rootData);
+    return JsonVariant(&_buffer, &_rootData);
   }
 
   void clear() {

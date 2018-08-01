@@ -23,7 +23,7 @@ class JsonObject {
 
   iterator begin() const {
     if (!_data) return iterator();
-    return iterator(_data->begin());
+    return iterator(_data->_buffer, _data->begin());
   }
 
   // Tells weither the specified key is present and associated with a value.
@@ -260,14 +260,17 @@ class JsonObject {
   typename Internals::JsonVariantAs<TValue>::type get_impl(
       TStringRef key) const {
     internal_iterator it = findKey<TStringRef>(key);
-    return it != _data->end() ? JsonVariant(&it->value).as<TValue>()
-                              : Internals::JsonVariantDefault<TValue>::get();
+    return it != _data->end()
+               ? JsonVariant(_data->_buffer, &it->value).as<TValue>()
+               : Internals::JsonVariantDefault<TValue>::get();
   }
 
   template <typename TStringRef, typename TValue>
   bool is_impl(TStringRef key) const {
     internal_iterator it = findKey<TStringRef>(key);
-    return it != _data->end() ? JsonVariant(&it->value).is<TValue>() : false;
+    return it != _data->end()
+               ? JsonVariant(_data->_buffer, &it->value).is<TValue>()
+               : false;
   }
 
   template <typename TStringRef>
@@ -297,7 +300,7 @@ class JsonObject {
 
     // save the value
     return Internals::ValueSaver<TValueRef>::save(
-        _data->_buffer, JsonVariant(&it->value), value);
+        _data->_buffer, JsonVariant(_data->_buffer, &it->value), value);
   }
 
   mutable Internals::JsonObjectData* _data;
