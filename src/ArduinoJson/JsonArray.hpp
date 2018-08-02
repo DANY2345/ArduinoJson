@@ -22,10 +22,11 @@ class JsonArray {
  public:
   typedef JsonArrayIterator iterator;
 
-  JsonArray() : _data(0) {}
-  explicit JsonArray(Internals::JsonArrayData* arr) : _data(arr) {}
+  JsonArray() : _buffer(0), _data(0) {}
+  explicit JsonArray(Internals::JsonBuffer* buf, Internals::JsonArrayData* arr)
+      : _buffer(buf), _data(arr) {}
   explicit JsonArray(Internals::JsonBuffer* buf)
-      : _data(new (buf) Internals::JsonArrayData(buf)) {}
+      : _buffer(buf), _data(new (buf) Internals::JsonArrayData()) {}
 
   // Adds the specified value at the end of the array.
   //
@@ -46,7 +47,7 @@ class JsonArray {
 
   iterator begin() const {
     if (!_data) return iterator();
-    return iterator(_data->_buffer, _data->begin());
+    return iterator(_buffer, _data->begin());
   }
 
   iterator end() const {
@@ -183,17 +184,18 @@ class JsonArray {
   bool set_impl(size_t index, TValueRef value) {
     iterator it = begin() += index;
     if (it == end()) return false;
-    return Internals::ValueSaver<TValueRef>::save(_data->_buffer, *it, value);
+    return Internals::ValueSaver<TValueRef>::save(_buffer, *it, value);
   }
 
   template <typename TValueRef>
   bool add_impl(TValueRef value) {
     if (!_data) return false;
-    iterator it = iterator(_data->_buffer, _data->add());
+    iterator it = iterator(_buffer, _data->add(_buffer));
     if (it == end()) return false;
-    return Internals::ValueSaver<TValueRef>::save(_data->_buffer, *it, value);
+    return Internals::ValueSaver<TValueRef>::save(_buffer, *it, value);
   }
 
+  Internals::JsonBuffer* _buffer;
   Internals::JsonArrayData* _data;
 };
 }  // namespace ArduinoJson

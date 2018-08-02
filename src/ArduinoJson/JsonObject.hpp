@@ -16,14 +16,16 @@ class JsonObject {
  public:
   typedef JsonObjectIterator iterator;
 
-  JsonObject() : _data(0) {}
-  explicit JsonObject(Internals::JsonObjectData* object) : _data(object) {}
+  JsonObject() : _buffer(0), _data(0) {}
+  explicit JsonObject(Internals::JsonBuffer* buf,
+                      Internals::JsonObjectData* object)
+      : _buffer(buf), _data(object) {}
   explicit JsonObject(Internals::JsonBuffer* buf)
-      : _data(new (buf) Internals::JsonObjectData(buf)) {}
+      : _buffer(buf), _data(new (buf) Internals::JsonObjectData()) {}
 
   iterator begin() const {
     if (!_data) return iterator();
-    return iterator(_data->_buffer, _data->begin());
+    return iterator(_buffer, _data->begin());
   }
 
   // Tells weither the specified key is present and associated with a value.
@@ -260,17 +262,15 @@ class JsonObject {
   typename Internals::JsonVariantAs<TValue>::type get_impl(
       TStringRef key) const {
     internal_iterator it = findKey<TStringRef>(key);
-    return it != _data->end()
-               ? JsonVariant(_data->_buffer, &it->value).as<TValue>()
-               : Internals::JsonVariantDefault<TValue>::get();
+    return it != _data->end() ? JsonVariant(_buffer, &it->value).as<TValue>()
+                              : Internals::JsonVariantDefault<TValue>::get();
   }
 
   template <typename TStringRef, typename TValue>
   bool is_impl(TStringRef key) const {
     internal_iterator it = findKey<TStringRef>(key);
-    return it != _data->end()
-               ? JsonVariant(_data->_buffer, &it->value).is<TValue>()
-               : false;
+    return it != _data->end() ? JsonVariant(_buffer, &it->value).is<TValue>()
+                              : false;
   }
 
   template <typename TStringRef>
@@ -291,18 +291,19 @@ class JsonObject {
     if (it == _data->end()) {
       // add the key
       // TODO: use JsonPairData directly, we don't need an iterator
-      it = _data->add();
+      it = _data->add(_buffer);
       if (it == _data->end()) return false;
       bool key_ok =
-          Internals::ValueSaver<TStringRef>::save(_data->_buffer, it->key, key);
+          Internals::ValueSaver<TStringRef>::save(_buffer, it->key, key);
       if (!key_ok) return false;
     }
 
     // save the value
     return Internals::ValueSaver<TValueRef>::save(
-        _data->_buffer, JsonVariant(_data->_buffer, &it->value), value);
+        _buffer, JsonVariant(_buffer, &it->value), value);
   }
 
+  mutable Internals::JsonBuffer* _buffer;
   mutable Internals::JsonObjectData* _data;
 };
 }  // namespace ArduinoJson

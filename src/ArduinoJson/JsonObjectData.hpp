@@ -19,8 +19,6 @@
 
 namespace ArduinoJson {
 namespace Internals {
-struct JsonObjectData : List<JsonPairData>, JsonBufferAllocated {
-  explicit JsonObjectData(JsonBuffer* buf) throw() : List<JsonPairData>(buf) {}
-};
+struct JsonObjectData : List<JsonPairData>, JsonBufferAllocated {};
 }  // namespace Internals
 }  // namespace ArduinoJson
