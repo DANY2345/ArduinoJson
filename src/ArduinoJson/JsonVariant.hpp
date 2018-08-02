@@ -134,7 +134,7 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   const typename Internals::enable_if<Internals::is_same<T, bool>::value,
                                       T>::type
   as() const {
-    return _data && _data->asInteger<T>() != 0;
+    return _data && _data->asInteger<int>() != 0;
   }
   //
   // double as<double>() const;
