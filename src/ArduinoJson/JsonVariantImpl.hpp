@@ -38,7 +38,7 @@ inline void JsonVariant::set(const JsonObject& object) {
 template <typename TString>
 inline void JsonVariant::set(
     const Internals::JsonObjectSubscript<TString>& value) {
-  set(value.as<JsonVariant>());
+  set(value.template as<JsonVariant>());
 }
 
 template <typename T>
