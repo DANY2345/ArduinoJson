@@ -40,18 +40,20 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   JsonVariant() : _buffer(0), _data(0) {}
 
   // set(bool value)
-  void set(bool value) {
-    if (!_data) return;
+  bool set(bool value) {
+    if (!_data) return false;
     _data->setBoolean(value);
+    return true;
   }
 
   // set(double value);
   // set(float value);
   template <typename T>
-  void set(T value, typename Internals::enable_if<
+  bool set(T value, typename Internals::enable_if<
                         Internals::is_floating_point<T>::value>::type * = 0) {
-    if (!_data) return;
+    if (!_data) return false;
     _data->setFloat(static_cast<Internals::JsonFloat>(value));
+    return true;
   }
 
   // set(char)
@@ -60,88 +62,97 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   // set(signed long)
   // set(signed char)
   template <typename T>
-  void set(T value,
+  bool set(T value,
            typename Internals::enable_if<Internals::is_integral<T>::value &&
                                          Internals::is_signed<T>::value>::type
                * = 0) {
-    if (!_data) return;
+    if (!_data) return false;
     if (value >= 0)
       _data->setPostiveInteger(static_cast<Internals::JsonUInt>(value));
     else
       _data->setNegativeInteger(~static_cast<Internals::JsonUInt>(value) + 1);
+    return true;
   }
 
   // set(unsigned short)
   // set(unsigned int)
   // set(unsigned long)
   template <typename T>
-  void set(T value,
+  bool set(T value,
            typename Internals::enable_if<Internals::is_integral<T>::value &&
                                          Internals::is_unsigned<T>::value>::type
                * = 0) {
-    if (!_data) return;
+    if (!_data) return false;
     _data->setPostiveInteger(static_cast<Internals::JsonUInt>(value));
+    return true;
   }
 
   // set(SerializedValue<const char *>)
-  void set(Internals::SerializedValue<const char *> value) {
-    if (!_data) return;
+  bool set(Internals::SerializedValue<const char *> value) {
+    if (!_data) return false;
     _data->setRaw(value.data(), value.size());
+    return true;
   }
 
   // set(SerializedValue<std::string>)
   // set(SerializedValue<String>)
   // set(SerializedValue<const __FlashStringHelper*>)
   template <typename T>
-  void set(Internals::SerializedValue<T> value,
+  bool set(Internals::SerializedValue<T> value,
            typename Internals::enable_if<
                !Internals::is_same<const char *, T>::value>::type * = 0) {
-    if (!_data) return;
+    if (!_data) return false;
     const char *dup =
         Internals::makeString(value.data(), value.size()).save(_buffer);
     if (dup)
       _data->setRaw(dup, value.size());
     else
       _data->setUndefined();
+    return true;
   }
 
   // set(const std::string&)
   // set(const String&)
   template <typename T>
-  void set(const T &value,
+  bool set(const T &value,
            typename Internals::enable_if<Internals::IsString<T>::value>::type
                * = 0) {
-    if (!_data) return;
+    if (!_data) return false;
     const char *dup = Internals::makeString(value).save(_buffer);
-    if (dup)
+    if (dup) {
       _data->setString(dup);
-    else
+      return true;
+    } else {
       _data->setUndefined();
+      return false;
+    }
   }
 
   // set(const char*);
   // set(const signed char*);
   // set(const unsigned char*);
   template <typename TChar>
-  void set(const TChar *value,
+  bool set(const TChar *value,
            typename Internals::enable_if<sizeof(TChar) == 1>::type * = 0) {
-    if (!_data) return;
+    if (!_data) return false;
     _data->setString(reinterpret_cast<const char *>(value));
+    return true;
   }
 
-  void set(JsonVariant value) {
-    if (!_data) return;
+  bool set(const JsonVariant &value) {
+    if (!_data) return false;
     if (value._data)
       *_data = *value._data;
     else
       _data->setUndefined();
+    return true;
   }
 
-  void set(const JsonArray &array);
-  void set(const Internals::JsonArraySubscript &);
-  void set(const JsonObject &object);
+  bool set(const JsonArray &array);
+  bool set(const Internals::JsonArraySubscript &);
+  bool set(const JsonObject &object);
   template <typename TString>
-  void set(const Internals::JsonObjectSubscript<TString> &);
+  bool set(const Internals::JsonObjectSubscript<TString> &);
 
   // Get the variant as the specified type.
   //

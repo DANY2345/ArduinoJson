@@ -184,7 +184,7 @@ class JsonArray {
   bool set_impl(size_t index, TValueRef value) {
     iterator it = begin() += index;
     if (it == end()) return false;
-    return Internals::ValueSaver<TValueRef>::save(_buffer, *it, value);
+    return it->set(value);
   }
 
   template <typename TValueRef>
@@ -192,7 +192,7 @@ class JsonArray {
     if (!_data) return false;
     iterator it = iterator(_buffer, _data->add(_buffer));
     if (it == end()) return false;
-    return Internals::ValueSaver<TValueRef>::save(_buffer, *it, value);
+    return it->set(value);
   }
 
   Internals::JsonBuffer* _buffer;

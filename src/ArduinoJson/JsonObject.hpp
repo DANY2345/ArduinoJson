@@ -299,8 +299,7 @@ class JsonObject {
     }
 
     // save the value
-    return Internals::ValueSaver<TValueRef>::save(
-        _buffer, JsonVariant(_buffer, &it->value), value);
+    return JsonVariant(_buffer, &it->value).set(value);
   }
 
   mutable Internals::JsonBuffer* _buffer;

@@ -15,11 +15,11 @@ class JsonVariantPtr {
                  Internals::JsonVariantData *data)
       : _variant(buffer, data) {}
 
-  const JsonVariant *operator->() const {
+  JsonVariant *operator->() {
     return &_variant;
   }
 
-  const JsonVariant &operator*() const {
+  JsonVariant &operator*() {
     return _variant;
   }
 

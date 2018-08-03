@@ -21,7 +21,7 @@ struct ValueSaver {
     return true;
   }
 
-  static bool save(JsonBuffer*, JsonVariant destination, Source source) {
+  static bool save(JsonBuffer*, JsonVariant& destination, Source source) {
     destination.set(source);
     return true;
   }
