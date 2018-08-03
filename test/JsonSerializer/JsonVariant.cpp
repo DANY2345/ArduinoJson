@@ -25,8 +25,20 @@ TEST_CASE("serializeJson(JsonVariant)") {
     check(static_cast<char *>(0), "null");
   }
 
-  SECTION("String") {
+  SECTION("const char*") {
     check("hello", "\"hello\"");
+  }
+
+  SECTION("string") {
+    check(std::string("hello"), "\"hello\"");
+  }
+
+  SECTION("SerializedValue<const char*>") {
+    check(serialized("[1,2]"), "[1,2]");
+  }
+
+  SECTION("SerializedValue<std::string>") {
+    check(serialized(std::string("[1,2]")), "[1,2]");
   }
 
   SECTION("Double") {

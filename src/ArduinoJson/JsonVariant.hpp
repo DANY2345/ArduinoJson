@@ -89,6 +89,22 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
     _data->setRaw(value.data(), value.size());
   }
 
+  // set(SerializedValue<std::string>)
+  // set(SerializedValue<String>)
+  // set(SerializedValue<const __FlashStringHelper*>)
+  template <typename T>
+  void set(Internals::SerializedValue<T> value,
+           typename Internals::enable_if<
+               !Internals::is_same<const char *, T>::value>::type * = 0) {
+    if (!_data) return;
+    const char *dup =
+        Internals::makeString(value.data(), value.size()).save(_buffer);
+    if (dup)
+      _data->setRaw(dup, value.size());
+    else
+      _data->setUndefined();
+  }
+
   // set(const std::string&)
   // set(const String&)
   template <typename T>
@@ -96,7 +112,11 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
            typename Internals::enable_if<Internals::IsString<T>::value>::type
                * = 0) {
     if (!_data) return;
-    set(Internals::makeString(value).save(_buffer));
+    const char *dup = Internals::makeString(value).save(_buffer);
+    if (dup)
+      _data->setString(dup);
+    else
+      _data->setUndefined();
   }
 
   // set(const char*);
