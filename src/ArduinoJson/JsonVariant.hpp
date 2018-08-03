@@ -132,8 +132,9 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   // set(const signed char*);
   // set(const unsigned char*);
   template <typename TChar>
-  bool set(const TChar *value,
-           typename Internals::enable_if<sizeof(TChar) == 1>::type * = 0) {
+  bool set(const TChar *const value,
+           typename Internals::enable_if<
+               sizeof(Internals::remove_const<TChar>::type) == 1>::type * = 0) {
     if (!_data) return false;
     _data->setString(reinterpret_cast<const char *>(value));
     return true;
