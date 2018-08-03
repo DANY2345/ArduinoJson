@@ -89,6 +89,16 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
     _data->setRaw(value.data(), value.size());
   }
 
+  // set(const std::string&)
+  // set(const String&)
+  template <typename T>
+  void set(const T &value,
+           typename Internals::enable_if<Internals::IsString<T>::value>::type
+               * = 0) {
+    if (!_data) return;
+    set(Internals::makeString(value).save(_buffer));
+  }
+
   // set(const char*);
   // set(const signed char*);
   // set(const unsigned char*);

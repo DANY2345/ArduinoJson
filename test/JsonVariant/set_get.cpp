@@ -48,8 +48,11 @@ TEST_CASE("JsonVariant set()/get()") {
   SECTION("Null") {
     checkValue<const char *>(NULL);
   }
-  SECTION("String") {
+  SECTION("const char*") {
     checkValue<const char *>("hello");
+  }
+  SECTION("std::string") {
+    checkValue<std::string>("hello");
   }
 
   SECTION("False") {
