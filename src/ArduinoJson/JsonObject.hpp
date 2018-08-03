@@ -293,13 +293,24 @@ class JsonObject {
       // TODO: use JsonPairData directly, we don't need an iterator
       it = _data->add(_buffer);
       if (it == _data->end()) return false;
-      bool key_ok =
-          Internals::ValueSaver<TStringRef>::save(_buffer, it->key, key);
-      if (!key_ok) return false;
+      if (!set_key(it, key)) return false;
     }
 
     // save the value
     return JsonVariant(_buffer, &it->value).set(value);
+  }
+
+  bool set_key(internal_iterator& it, const char* key) {
+    it->key = key;
+    return true;
+  }
+
+  template <typename T>
+  bool set_key(internal_iterator& it, const T& key) {
+    const char* dup = Internals::makeString(key).save(_buffer);
+    if (!dup) return false;
+    it->key = dup;
+    return true;
   }
 
   mutable Internals::JsonBuffer* _buffer;
