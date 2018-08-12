@@ -11,9 +11,6 @@ namespace ArduinoJson {
 
 template <size_t CAPACITY>
 class StaticJsonDocument {
-  mutable Internals::StaticJsonBuffer<CAPACITY> _buffer;
-  mutable Internals::JsonVariantData _rootData;
-
  public:
   uint8_t nestingLimit;
 
@@ -25,12 +22,12 @@ class StaticJsonDocument {
 
   template <typename T>
   bool is() const {
-    return JsonVariant(&_buffer, &_rootData).is<T>();
+    return getVariant().is<T>();
   }
 
   template <typename T>
   typename Internals::JsonVariantAs<T>::type as() const {
-    return JsonVariant(&_buffer, &_rootData).as<T>();
+    return getVariant().as<T>();
   }
 
   // JsonObject to<JsonObject>()
@@ -40,7 +37,7 @@ class StaticJsonDocument {
   to() {
     clear();
     JsonObject object(&_buffer);
-    as<JsonVariant>().set(object);
+    getVariant().set(object);
     return object;
   }
 
@@ -51,7 +48,7 @@ class StaticJsonDocument {
   to() {
     clear();
     JsonArray array(&_buffer);
-    as<JsonVariant>().set(array);
+    getVariant().set(array);
     return array;
   }
 
@@ -61,7 +58,7 @@ class StaticJsonDocument {
                                 JsonVariant>::type
   to() {
     clear();
-    return JsonVariant(&_buffer, &_rootData);
+    return getVariant();
   }
 
   void clear() {
@@ -75,8 +72,16 @@ class StaticJsonDocument {
 
   template <typename Visitor>
   void visit(Visitor& visitor) const {
-    return JsonVariant(&_rootData).visit(visitor);
+    return getVariant().visit(visitor);
   }
+
+ private:
+  JsonVariant getVariant() const {
+    return JsonVariant(&_buffer, &_rootData);
+  }
+
+  mutable Internals::StaticJsonBuffer<CAPACITY> _buffer;
+  mutable Internals::JsonVariantData _rootData;
 };
 
 }  // namespace ArduinoJson
