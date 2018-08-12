@@ -25,7 +25,7 @@ class JsonDeserializer {
         _stringStorage(stringStorage),
         _nestingLimit(nestingLimit),
         _loaded(false) {}
-  DeserializationError parse(JsonVariant variant) {
+  DeserializationError parse(JsonVariantData &variant) {
     DeserializationError err = skipSpacesAndComments();
     if (err) return err;
 
@@ -65,12 +65,12 @@ class JsonDeserializer {
     return true;
   }
 
-  DeserializationError parseArray(JsonVariant &variant) {
+  DeserializationError parseArray(JsonVariantData &variant) {
     if (_nestingLimit == 0) return DeserializationError::TooDeep;
 
-    JsonArray array(_buffer);
-    if (array.isNull()) return DeserializationError::NoMemory;
-    variant.set(array);
+    JsonArrayData *array = new (_buffer) JsonArrayData;
+    if (!array) return DeserializationError::NoMemory;
+    variant.setArray(*array);
 
     // Check opening braket
     if (!eat('[')) return DeserializationError::InvalidInput;
@@ -84,14 +84,15 @@ class JsonDeserializer {
 
     // Read each value
     for (;;) {
+      // Allocate slot in array
+      JsonVariantData *value = array->addSlot(_buffer);
+      if (!value) return DeserializationError::NoMemory;
+
       // 1 - Parse value
-      JsonVariantData variantData;
-      JsonVariant value(_buffer, &variantData);  // TODO: remove
       _nestingLimit--;
-      err = parse(value);
+      err = parse(*value);
       _nestingLimit++;
       if (err) return err;
-      if (!array.add(value)) return DeserializationError::NoMemory;
 
       // 2 - Skip spaces
       err = skipSpacesAndComments();
@@ -103,12 +104,12 @@ class JsonDeserializer {
     }
   }
 
-  DeserializationError parseObject(JsonVariant &variant) {
+  DeserializationError parseObject(JsonVariantData &variant) {
     if (_nestingLimit == 0) return DeserializationError::TooDeep;
 
-    JsonObject object(_buffer);
-    if (object.isNull()) return DeserializationError::NoMemory;
-    variant.set(object);
+    JsonObjectData *object = new (_buffer) JsonObjectData;
+    if (!object) return DeserializationError::NoMemory;
+    variant.setObject(*object);
 
     // Check opening brace
     if (!eat('{')) return DeserializationError::InvalidInput;
@@ -132,14 +133,15 @@ class JsonDeserializer {
       if (err) return err;  // Colon
       if (!eat(':')) return DeserializationError::InvalidInput;
 
+      // Allocate slot in object
+      JsonVariantData *value = object->addSlot(_buffer, key);
+      if (!value) return DeserializationError::NoMemory;
+
       // Parse value
-      JsonVariantData variantData;
-      JsonVariant value(_buffer, &variantData);
       _nestingLimit--;
-      err = parse(value);
+      err = parse(*value);
       _nestingLimit++;
       if (err) return err;
-      if (!object.set(key, value)) return DeserializationError::NoMemory;
 
       // Skip spaces
       err = skipSpacesAndComments();
@@ -155,7 +157,7 @@ class JsonDeserializer {
     }
   }
 
-  DeserializationError parseValue(JsonVariant &variant) {
+  DeserializationError parseValue(JsonVariantData &variant) {
     if (isQuote(current())) {
       return parseStringValue(variant);
     } else {
@@ -171,11 +173,11 @@ class JsonDeserializer {
     }
   }
 
-  DeserializationError parseStringValue(JsonVariant &variant) {
+  DeserializationError parseStringValue(JsonVariantData &variant) {
     const char *value;
     DeserializationError err = parseQuotedString(&value);
     if (err) return err;
-    variant.set(value);
+    variant.setString(value);
     return DeserializationError::Ok;
   }
 
@@ -233,7 +235,7 @@ class JsonDeserializer {
     return DeserializationError::Ok;
   }
 
-  DeserializationError parseNumericValue(JsonVariant &result) {
+  DeserializationError parseNumericValue(JsonVariantData &result) {
     char buffer[64];
     uint8_t n = 0;
 
@@ -246,15 +248,15 @@ class JsonDeserializer {
     buffer[n] = 0;
 
     if (isInteger(buffer)) {
-      result.set(parseInteger<JsonInteger>(buffer));
+      result.setInteger(parseInteger<JsonInteger>(buffer));
     } else if (isFloat(buffer)) {
-      result.set(parseFloat<JsonFloat>(buffer));
+      result.setFloat(parseFloat<JsonFloat>(buffer));
     } else if (!strcmp(buffer, "true")) {
-      result.set(true);
+      result.setBoolean(true);
     } else if (!strcmp(buffer, "false")) {
-      result.set(false);
+      result.setBoolean(false);
     } else if (!strcmp(buffer, "null")) {
-      result.set(static_cast<const char *>(0));
+      result.setString(static_cast<const char *>(0));
     } else {
       return DeserializationError::InvalidInput;
     }

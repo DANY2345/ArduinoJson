@@ -61,9 +61,19 @@ class StaticJsonDocument {
     return getVariant();
   }
 
+  // JsonVariantData& to<JsonVariantData>()
+  template <typename T>
+  typename Internals::enable_if<
+      Internals::is_same<T, Internals::JsonVariantData>::value,
+      Internals::JsonVariantData&>::type
+  to() {
+    clear();
+    return _rootData;
+  }
+
   void clear() {
     _buffer.clear();
-    _rootData.type = Internals::JSON_UNDEFINED;
+    _rootData.setUndefined();
   }
 
   size_t memoryUsage() const {

@@ -51,13 +51,23 @@ class DynamicJsonDocument {
     return array;
   }
 
-  // JsonVariant& to<JsonVariant>()
+  // JsonVariant to<JsonVariant>()
   template <typename T>
   typename Internals::enable_if<Internals::is_same<T, JsonVariant>::value,
                                 JsonVariant>::type
   to() {
     clear();
     return getVariant();
+  }
+
+  // JsonVariantData& to<JsonVariantData>()
+  template <typename T>
+  typename Internals::enable_if<
+      Internals::is_same<T, Internals::JsonVariantData>::value,
+      Internals::JsonVariantData&>::type
+  to() {
+    clear();
+    return _rootData;
   }
 
   Internals::DynamicJsonBuffer& buffer() {

@@ -18,6 +18,11 @@
 
 namespace ArduinoJson {
 namespace Internals {
-struct JsonArrayData : List<JsonVariantData>, JsonBufferAllocated {};
+struct JsonArrayData : List<JsonVariantData>, JsonBufferAllocated {
+  JsonVariantData* addSlot(JsonBuffer* buffer) {
+    iterator it = add(buffer);
+    return it != end() ? &*it : 0;
+  }
+};
 }  // namespace Internals
 }  // namespace ArduinoJson

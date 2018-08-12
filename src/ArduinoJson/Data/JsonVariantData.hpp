@@ -26,6 +26,13 @@ struct JsonVariantData {
     content.asFloat = value;
   }
 
+  void setInteger(JsonInteger value) {
+    if (value > 0)
+      setPostiveInteger(value);
+    else
+      setNegativeInteger(-value);
+  }
+
   void setNegativeInteger(JsonUInt value) {
     type = JSON_NEGATIVE_INTEGER;
     content.asInteger = value;
