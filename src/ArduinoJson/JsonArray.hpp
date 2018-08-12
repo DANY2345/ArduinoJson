@@ -121,7 +121,7 @@ class JsonArray {
   template <typename T>
   typename Internals::JsonVariantAs<T>::type get(size_t index) const {
     iterator it = begin() += index;
-    return it != end() ? it->as<T>() : Internals::JsonVariantDefault<T>::get();
+    return it != end() ? it->as<T>() : T();
   }
 
   // Check the type of the value at specified index.

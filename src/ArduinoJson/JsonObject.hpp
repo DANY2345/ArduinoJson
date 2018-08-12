@@ -263,7 +263,7 @@ class JsonObject {
       TStringRef key) const {
     internal_iterator it = findKey<TStringRef>(key);
     return it != _data->end() ? JsonVariant(_buffer, &it->value).as<TValue>()
-                              : Internals::JsonVariantDefault<TValue>::get();
+                              : TValue();
   }
 
   template <typename TStringRef, typename TValue>

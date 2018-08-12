@@ -8,7 +8,6 @@
 #include <stdint.h>  // for uint8_t
 
 #include "Data/JsonVariantData.hpp"
-#include "Data/JsonVariantDefault.hpp"
 #include "JsonVariant.hpp"
 #include "JsonVariantBase.hpp"
 #include "Memory/JsonBuffer.hpp"
@@ -175,7 +174,7 @@ class JsonVariant : public Internals::JsonVariantBase<JsonVariant> {
   template <typename T>
   const typename Internals::enable_if<Internals::is_integral<T>::value, T>::type
   as() const {
-    return _data ? _data->asInteger<T>() : 0;
+    return _data ? _data->asInteger<T>() : T();
   }
   // bool as<bool>() const
   template <typename T>
