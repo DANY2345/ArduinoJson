@@ -22,12 +22,12 @@ class StaticJsonDocument {
 
   template <typename T>
   bool is() const {
-    return getVariant().is<T>();
+    return getVariant().template is<T>();
   }
 
   template <typename T>
   typename Internals::JsonVariantAs<T>::type as() const {
-    return getVariant().as<T>();
+    return getVariant().template as<T>();
   }
 
   // JsonObject to<JsonObject>()

@@ -28,9 +28,9 @@ struct JsonVariantData {
 
   void setInteger(JsonInteger value) {
     if (value > 0)
-      setPostiveInteger(value);
+      setPostiveInteger(static_cast<JsonUInt>(value));
     else
-      setNegativeInteger(-value);
+      setNegativeInteger(static_cast<JsonUInt>(-value));
   }
 
   void setNegativeInteger(JsonUInt value) {
